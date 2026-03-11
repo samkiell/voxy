@@ -1,0 +1,55 @@
+-- LocalVoice AI Database Schema Placeholder
+
+-- Users Table
+-- CREATE TABLE users (
+--     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     email VARCHAR(255) UNIQUE NOT NULL,
+--     password_hash TEXT NOT NULL,
+--     name VARCHAR(255),
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- Businesses Table
+-- CREATE TABLE businesses (
+--     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     user_id UUID REFERENCES users(id),
+--     name VARCHAR(255) NOT NULL,
+--     industry VARCHAR(100),
+--     description TEXT,
+--     services TEXT,
+--     pricing_info TEXT,
+--     opening_hours TEXT,
+--     supported_languages TEXT[] DEFAULT '{"English"}',
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- Conversations Table
+-- CREATE TABLE conversations (
+--     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     business_id UUID REFERENCES businesses(id),
+--     customer_id VARCHAR(255), -- External ID (e.g. WhatsApp number)
+--     start_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+--     last_message_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- Voice Logs Table (Messages)
+-- CREATE TABLE message_logs (
+--     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     conversation_id UUID REFERENCES conversations(id),
+--     sender_type VARCHAR(20), -- 'customer' or 'ai'
+--     message_type VARCHAR(20), -- 'text' or 'voice'
+--     content TEXT, -- transcript or AI response
+--     audio_url TEXT, -- S3 URL for voice notes
+--     language VARCHAR(50),
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- Analytics Table
+-- CREATE TABLE analytics_summary (
+--     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     business_id UUID REFERENCES businesses(id),
+--     metric_name VARCHAR(100),
+--     metric_value INT,
+--     period_start TIMESTAMP WITH TIME ZONE,
+--     period_end TIMESTAMP WITH TIME ZONE
+-- );
