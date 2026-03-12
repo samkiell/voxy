@@ -168,4 +168,4 @@ Automated appointment booking
 
 Conclusion
 
-LocalVoice AI aims to simplify customer communication for small businesses by providing a voice-enabled AI assistant capable of responding instantly in multiple languages. The initial MVP focuses on demonstrating the core interaction between voice input, AI understanding, and automated responses while laying the foundation for a scalable SaaS product.
+LocalVoice AI aims to simplify customer communication for small businesses by providing a voice-enabled AI assistant capable of responding instantly in multiple languages. The initial MVP focuses on demonstrating the core interaction between voice input, AI understanding, and automated responses while laying the foundation for a scalable SaaS product. No gradient.
