@@ -2,23 +2,25 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 
 export default function DashboardPage() {
   return (
-    <DashboardLayout title="Dashboard">
-      <div className="p-8">
-        <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-        <p className="mt-2 text-slate-600">Quick overview of your business activity and assistant performance.</p>
+    <DashboardLayout title="Dashboard Overview">
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
+          <p className="mt-2 text-zinc-400">Quick overview of your business activity and assistant performance.</p>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="p-6 bg-white rounded-xl shadow-sm border">
-            <h3 className="text-sm font-medium text-slate-500 uppercase">Total Conversations</h3>
-            <p className="text-2xl font-bold mt-2 text-slate-900">0</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-8 bg-zinc-900/50 rounded-2xl border border-white/5 hover:border-[#00D18F]/20 transition-all group">
+            <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Total Conversations</h3>
+            <p className="text-4xl font-black mt-3 text-white group-hover:text-[#00D18F] transition-colors">0</p>
           </div>
-          <div className="p-6 bg-white rounded-xl shadow-sm border">
-            <h3 className="text-sm font-medium text-slate-500 uppercase">AI Responses</h3>
-            <p className="text-2xl font-bold mt-2 text-slate-900">0</p>
+          <div className="p-8 bg-zinc-900/50 rounded-2xl border border-white/5 hover:border-[#00D18F]/20 transition-all group">
+            <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest">AI Responses</h3>
+            <p className="text-4xl font-black mt-3 text-white group-hover:text-[#00D18F] transition-colors">0</p>
           </div>
-          <div className="p-6 bg-white rounded-xl shadow-sm border">
-            <h3 className="text-sm font-medium text-slate-500 uppercase">Languages Used</h3>
-            <p className="text-2xl font-bold mt-2 text-slate-900">0</p>
+          <div className="p-8 bg-zinc-900/50 rounded-2xl border border-white/5 hover:border-[#00D18F]/20 transition-all group">
+            <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Languages Used</h3>
+            <p className="text-4xl font-black mt-3 text-white group-hover:text-[#00D18F] transition-colors">0</p>
           </div>
         </div>
       </div>
