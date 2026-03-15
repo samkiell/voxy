@@ -10,7 +10,7 @@ const LandingPage = () => {
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-400 shrink-0" />
             <span className="text-xl font-bold tracking-tight">
-              LocalVoice <span className="text-emerald-500">AI</span>
+              Voxy
             </span>
           </div>
           <div className="hidden items-center gap-8 text-sm font-medium text-zinc-400 md:flex">
@@ -122,28 +122,52 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Trust Quote */}
-        <section className="bg-white py-24 border-t border-slate-100">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <div className="text-4xl font-serif text-slate-300 mb-8 opacity-50">
-              "
-            </div>
-            <p className="text-2xl font-light italic text-slate-600 sm:text-3xl">
-              "LocalVoice AI transformed how I handle delivery orders in Lagos. I
-              no longer miss calls during rush hour, and my customers love that it
-              speaks their language."
-            </p>
-            <div className="mt-8 flex flex-col items-center gap-2">
-              <div className="size-12 rounded-full border border-blue-500/20 bg-slate-100" />
-              <span className="font-bold text-slate-900">Emeka Okafor</span>
-              <span className="text-sm text-slate-500 uppercase tracking-widest">
-                Founder, LagosDelights
-              </span>
-            </div>
+      {/* Trust Quote */}
+      <section className="bg-gradient-to-b from-black to-zinc-950 py-24">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <div className="text-4xl font-serif text-zinc-500 mb-8 opacity-50">
+            "
           </div>
-        </section>
-      </div>
-    </PublicLayout>
+          <p className="text-2xl font-light italic text-zinc-300 sm:text-3xl">
+            "Voxy transformed how I handle delivery orders in Lagos. I
+            no longer miss calls during rush hour, and my customers love that it
+            speaks their language."
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-2">
+            <div className="size-12 rounded-full border border-emerald-500/20 bg-zinc-800" />
+            <span className="font-bold whitespace-nowrap">Emeka Okafor</span>
+            <span className="text-sm text-zinc-500 uppercase tracking-widest">
+              Founder, LagosDelights
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-12 px-6">
+        <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-2">
+            <div className="size-6 rounded bg-emerald-500" />
+            <span className="text-lg font-bold tracking-tight">Voxy</span>
+          </div>
+          <div className="flex gap-8 text-sm text-zinc-500">
+            <Link href="#" className="hover:text-emerald-400">
+              Terms
+            </Link>
+            <Link href="#" className="hover:text-emerald-400">
+              Privacy
+            </Link>
+            <Link href="#" className="hover:text-emerald-400">
+              Contact
+            </Link>
+          </div>
+          <p className="text-sm text-zinc-600">
+            &copy; {new Date().getFullYear()} Voxy. Built for the
+            future of Africa.
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 };
 

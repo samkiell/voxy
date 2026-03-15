@@ -6,7 +6,7 @@ export default function RegisterPage() {
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-6">
         <div className="w-full max-w-md bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
           <h1 className="text-3xl font-bold text-slate-900 text-center">Register</h1>
-          <p className="mt-4 text text-slate-600 text-center">Create an account to start using LocalVoice AI for your business.</p>
+          <p className="mt-4 text text-slate-600 text-center">Create an account to start using Voxy for your business.</p>
           
           <form className="mt-8 space-y-4">
             <div className="space-y-2">

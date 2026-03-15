@@ -6,7 +6,7 @@ export default function LoginPage() {
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-6">
         <div className="w-full max-w-md bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
           <h1 className="text-3xl font-bold text-slate-900 text-center">Login</h1>
-          <p className="mt-4 text text-slate-600 text-center">Enter your credentials to access your LocalVoice AI dashboard.</p>
+          <p className="mt-4 text text-slate-600 text-center">Enter your credentials to access your Voxy dashboard.</p>
           
           <form className="mt-8 space-y-4">
             <div className="space-y-2">
