@@ -12,26 +12,33 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-64 bg-slate-900 text-white min-h-screen p-6 flex flex-col">
-      <div className="text-2xl font-bold mb-10 flex items-center gap-2">
-        <span className="text-blue-400">🎙️</span> Voxy
+    <div className="w-64 bg-black text-zinc-400 min-h-screen p-6 flex flex-col border-r border-white/5">
+      <div className="mb-10 flex items-center gap-3">
+        <img src="/favicon.jpg" alt="Voxy Logo" className="size-8 rounded-lg object-cover" />
+        <span className="text-xl font-bold tracking-tight text-white">Voxy</span>
       </div>
       
       <nav className="flex-1 space-y-1">
         {navItems.map((item) => (
-          <Link key={item.name} href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors">
-            <span>{item.icon}</span>
-            <span className="font-medium">{item.name}</span>
+          <Link 
+            key={item.name} 
+            href={item.href} 
+            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 hover:text-[#00D18F] transition-all group"
+          >
+            <span className="text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
+            <span className="font-semibold">{item.name}</span>
           </Link>
         ))}
       </nav>
       
-      <div className="pt-6 border-t border-slate-800 mt-auto">
+      <div className="pt-6 border-t border-white/5 mt-auto">
         <div className="flex items-center gap-3 px-4">
-          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold">S</div>
+          <div className="w-10 h-10 rounded-full bg-[#00D18F] text-black flex items-center justify-center font-bold text-lg shadow-lg shadow-[#00D18F]/20">
+            S
+          </div>
           <div>
-            <div className="text-sm font-medium">SAMKIEL</div>
-            <div className="text-xs text-slate-400">Admin</div>
+            <div className="text-sm font-bold text-white uppercase tracking-tighter">SAMKIEL</div>
+            <div className="text-xs text-zinc-500 font-medium">Administrator</div>
           </div>
         </div>
       </div>

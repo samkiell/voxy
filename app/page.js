@@ -1,14 +1,15 @@
 import React from "react";
+import Link from "next/link";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-emerald-500/30 selection:text-emerald-400">
+    <div className="min-h-screen bg-black text-white selection:bg-[#00D18F]/30 selection:text-[#00D18F]">
       {/* Navbar */}
       <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-black/60 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-400 shrink-0" />
-            <span className="text-xl font-bold tracking-tight">
+          <div className="flex items-center gap-3">
+            <img src="/favicon.jpg" alt="Voxy Logo" className="size-8 rounded-lg object-cover" />
+            <span className="text-xl font-bold tracking-tight text-white">
               Voxy
             </span>
           </div>
@@ -27,52 +28,59 @@ const LandingPage = () => {
             </a>
           </div>
           <div className="flex items-center gap-4">
-            <button className="text-sm font-medium text-zinc-400 transition-colors hover:text-white">
+            <Link 
+              href="/login"
+              className="text-sm font-medium text-zinc-400 transition-colors hover:text-white"
+            >
               Login
-            </button>
-            <button className="rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-black transition-all hover:bg-emerald-400 hover:scale-105 active:scale-95">
+            </Link>
+            <Link 
+              href="/register"
+              className="rounded-full bg-[#00D18F] px-5 py-2 text-sm font-semibold text-black transition-all hover:brightness-110"
+            >
               Get Started
-            </button>
+            </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-20 md:pt-48 md:pb-32">
-        {/* Background Gradients */}
-        <div className="absolute top-0 -z-10 h-[600px] w-full bg-[radial-gradient(circle_farthest-side_at_50%_0%,rgba(16,185,129,0.1),transparent)]" />
-        <div className="absolute top-[200px] -z-10 h-[300px] w-full bg-[radial-gradient(circle_farthest-side_at_100%_100%,rgba(20,184,166,0.05),transparent)]" />
-
+      <section className="relative flex flex-col items-center justify-center px-6 pt-32 pb-20 md:pt-48 md:pb-32">
         <div className="max-w-4xl text-center space-y-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-4 py-1.5 text-xs font-semibold text-emerald-400 backdrop-blur-sm animate-fade-in">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#00D18F]/20 bg-[#00D18F]/5 px-4 py-1.5 text-xs font-semibold text-[#00D18F] backdrop-blur-sm">
             <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00D18F] opacity-75"></span>
+              <span className="relative inline-flex size-2 rounded-full bg-[#00D18F]"></span>
             </span>
             Now supporting 12+ African Languages
           </div>
 
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
+          <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl text-white leading-[1.1] md:-tracking-[0.02em]">
             Speak the Language of <br className="hidden md:block" />
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+            <span className="text-[#00D18F]">
               Your People.
             </span>
           </h1>
 
-          <p className="mx-auto max-w-2xl text-lg text-zinc-400 sm:text-xl">
+          <p className="mx-auto max-w-2xl text-lg text-zinc-400 sm:text-xl font-medium leading-relaxed">
             Empower your business with an AI voice assistant that understands
             local dialects and nuances. Seamlessly handle orders, inquiries, and
             support across Africa.
           </p>
 
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button className="group relative w-full rounded-full bg-emerald-500 px-8 py-4 text-center font-bold text-black transition-all hover:bg-emerald-400 sm:w-auto">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row pt-4">
+            <Link 
+              href="/register"
+              className="w-full rounded-full bg-[#00D18F] px-10 py-5 text-center font-bold text-black transition-all hover:brightness-110 sm:w-auto"
+            >
               Start Free Trial
-              <span className="absolute inset-0 rounded-full bg-emerald-400 blur transition-all group-hover:blur-lg opacity-20"></span>
-            </button>
-            <button className="w-full rounded-full border border-white/10 bg-white/5 px-8 py-4 text-center font-bold transition-all hover:bg-white/10 sm:w-auto">
+            </Link>
+            <Link 
+              href="/register"
+              className="w-full rounded-full border border-white/10 bg-zinc-900 px-10 py-5 text-center font-bold transition-all hover:bg-zinc-800 sm:w-auto text-white"
+            >
               Book a Demo
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -99,7 +107,7 @@ const LandingPage = () => {
           ].map((feature, i) => (
             <div
               key={i}
-              className="group relative rounded-2xl border border-white/5 bg-zinc-900/50 p-8 transition-all hover:border-emerald-500/20 hover:bg-zinc-900"
+              className="group relative rounded-2xl border border-white/5 bg-zinc-900/40 p-8 transition-all hover:border-[#00D18F]/30 hover:bg-zinc-900/60"
             >
               <div className="mb-4 text-3xl">{feature.icon}</div>
               <h3 className="mb-3 text-xl font-bold text-white">
@@ -112,9 +120,9 @@ const LandingPage = () => {
       </section>
 
       {/* Trust Quote */}
-      <section className="bg-gradient-to-b from-black to-zinc-950 py-24">
+      <section className="bg-black py-24 border-t border-white/5">
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <div className="text-4xl font-serif text-zinc-500 mb-8 opacity-50">
+          <div className="text-4xl font-serif text-zinc-700 mb-8 opacity-50">
             "
           </div>
           <p className="text-2xl font-light italic text-zinc-300 sm:text-3xl">
@@ -123,8 +131,10 @@ const LandingPage = () => {
             speaks their language."
           </p>
           <div className="mt-8 flex flex-col items-center gap-2">
-            <div className="size-12 rounded-full border border-emerald-500/20 bg-zinc-800" />
-            <span className="font-bold">Emeka Okafor</span>
+            <div className="size-12 rounded-full border border-white/10 bg-zinc-900 overflow-hidden">
+               <img src="/favicon.jpg" alt="Founder" className="size-full object-cover grayscale opacity-50" />
+            </div>
+            <span className="font-bold whitespace-nowrap text-white">Emeka Okafor</span>
             <span className="text-sm text-zinc-500 uppercase tracking-widest">
               Founder, LagosDelights
             </span>
@@ -133,24 +143,22 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-12 px-6">
+      <footer className="border-t border-white/5 py-12 px-6 bg-black">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className="size-6 rounded bg-emerald-500" />
-            <span className="text-lg font-bold tracking-tight">
-              Voxy
-            </span>
+          <div className="flex items-center gap-3">
+            <img src="/favicon.jpg" alt="Voxy Logo" className="size-8 rounded-lg object-cover" />
+            <span className="text-lg font-bold tracking-tight text-white">Voxy</span>
           </div>
           <div className="flex gap-8 text-sm text-zinc-500">
-            <a href="#" className="hover:text-emerald-400">
+            <Link href="#" className="hover:text-[#00D18F]">
               Terms
-            </a>
-            <a href="#" className="hover:text-emerald-400">
+            </Link>
+            <Link href="#" className="hover:text-[#00D18F]">
               Privacy
-            </a>
-            <a href="#" className="hover:text-emerald-400">
+            </Link>
+            <Link href="#" className="hover:text-[#00D18F]">
               Contact
-            </a>
+            </Link>
           </div>
           <p className="text-sm text-zinc-600">
             &copy; {new Date().getFullYear()} Voxy. Built for the
