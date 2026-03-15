@@ -8,7 +8,7 @@ const LandingPage = () => {
       <nav className="fixed top-0 z-50 w-full border-b border-white/5 bg-black/60 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <img src="/logo.jpg" alt="Voxy Logo" className="size-8 rounded-lg object-cover" />
+            <img src="/favicon.jpg" alt="Voxy Logo" className="size-8 rounded-lg object-cover" />
             <span className="text-xl font-bold tracking-tight text-white">
               Voxy
             </span>
@@ -55,7 +55,7 @@ const LandingPage = () => {
             Now supporting 12+ African Languages
           </div>
 
-          <h1 className="text-6xl font-extrabold tracking-tight sm:text-[100px] text-white leading-[1.05] md:-tracking-[0.02em]">
+          <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl text-white leading-[1.1] md:-tracking-[0.02em]">
             Speak the Language of <br className="hidden md:block" />
             <span className="text-[#00D18F]">
               Your People.
@@ -132,7 +132,7 @@ const LandingPage = () => {
           </p>
           <div className="mt-8 flex flex-col items-center gap-2">
             <div className="size-12 rounded-full border border-white/10 bg-zinc-900 overflow-hidden">
-               <img src="/logo.jpg" alt="Founder" className="size-full object-cover grayscale opacity-50" />
+               <img src="/favicon.jpg" alt="Founder" className="size-full object-cover grayscale opacity-50" />
             </div>
             <span className="font-bold whitespace-nowrap text-white">Emeka Okafor</span>
             <span className="text-sm text-zinc-500 uppercase tracking-widest">
@@ -146,7 +146,7 @@ const LandingPage = () => {
       <footer className="border-t border-white/5 py-12 px-6 bg-black">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
-            <img src="/logo.jpg" alt="Voxy Logo" className="size-6 rounded" />
+            <img src="/favicon.jpg" alt="Voxy Logo" className="size-8 rounded-lg object-cover" />
             <span className="text-lg font-bold tracking-tight text-white">Voxy</span>
           </div>
           <div className="flex gap-8 text-sm text-zinc-500">
