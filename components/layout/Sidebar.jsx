@@ -1,14 +1,23 @@
 import Link from 'next/link';
+import { 
+  LayoutDashboard, 
+  Bot, 
+  MessageSquare, 
+  BarChart3, 
+  Building2, 
+  Globe, 
+  Settings 
+} from 'lucide-react';
 
 export default function Sidebar() {
   const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: '📊' },
-    { name: 'Assistant', href: '/assistant', icon: '🤖' },
-    { name: 'Conversations', href: '/conversations', icon: '💬' },
-    { name: 'Analytics', href: '/analytics', icon: '📈' },
-    { name: 'Business', href: '/business', icon: '🏢' },
-    { name: 'Languages', href: '/languages', icon: '🌐' },
-    { name: 'Settings', href: '/settings', icon: '⚙️' },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Assistant', href: '/assistant', icon: Bot },
+    { name: 'Conversations', href: '/conversations', icon: MessageSquare },
+    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { name: 'Business', href: '/business', icon: Building2 },
+    { name: 'Languages', href: '/languages', icon: Globe },
+    { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
   return (
@@ -25,7 +34,7 @@ export default function Sidebar() {
             href={item.href} 
             className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 hover:text-[#00D18F] transition-all group"
           >
-            <span className="text-xl group-hover:scale-110 transition-transform">{item.icon}</span>
+            <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-semibold">{item.name}</span>
           </Link>
         ))}

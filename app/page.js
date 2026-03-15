@@ -1,5 +1,5 @@
-import React from "react";
 import Link from "next/link";
+import { Globe, Zap, Shield } from "lucide-react";
 
 const LandingPage = () => {
   return (
@@ -92,24 +92,26 @@ const LandingPage = () => {
             {
               title: "Native Accents",
               desc: "Deeply trained on Pidgin, Yoruba, Swahili and more. Not just translation - true understanding.",
-              icon: "🌍",
+              icon: Globe,
             },
             {
               title: "Lightning Fast",
               desc: "Optimized response times less than 1s. Keep your customers engaged without the wait.",
-              icon: "⚡",
+              icon: Zap,
             },
             {
               title: "Privacy First",
               desc: "Local processing options available for sensitive business data. Your data stays Yours.",
-              icon: "🛡️",
+              icon: Shield,
             },
           ].map((feature, i) => (
             <div
               key={i}
               className="group relative rounded-2xl border border-white/5 bg-zinc-900/40 p-8 transition-all hover:border-[#00D18F]/30 hover:bg-zinc-900/60"
             >
-              <div className="mb-4 text-3xl">{feature.icon}</div>
+              <div className="mb-4 text-[#00D18F]">
+                <feature.icon className="size-8" />
+              </div>
               <h3 className="mb-3 text-xl font-bold text-white">
                 {feature.title}
               </h3>
