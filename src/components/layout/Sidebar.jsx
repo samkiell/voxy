@@ -87,7 +87,15 @@ export default function Sidebar({ isOpen, onClose }) {
         </nav>
         
         <div className="pt-6 border-t border-zinc-200 dark:border-white/5 mt-auto">
-          <div className="flex items-center gap-3 px-2 mb-4">
+          <button 
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all group mb-4"
+          >
+            <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-semibold">Logout</span>
+          </button>
+
+          <div className="flex items-center gap-3 px-2">
             <div className="w-10 h-10 rounded-full bg-[#00D18F] text-black flex items-center justify-center font-bold text-lg shadow-lg shadow-[#00D18F]/20 flex-shrink-0">
               {userDisplayName.charAt(0).toUpperCase()}
             </div>
@@ -96,14 +104,6 @@ export default function Sidebar({ isOpen, onClose }) {
               <div className="text-[10px] text-zinc-500 font-medium capitalize truncate">{userRoleDisplay.replace('_', ' ')}</div>
             </div>
           </div>
-          
-          <button 
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all group"
-          >
-            <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-semibold">Logout</span>
-          </button>
         </div>
       </div>
     </>
