@@ -103,5 +103,30 @@ export const useAuth = () => {
     }
   };
 
-  return { user, loading, error, register, login, logout, setUser, refreshSession };
+  const forgotPassword = async (email) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to send reset link');
+      
+      toast.success("Reset link sent successfully!");
+      return data;
+    } catch (err) {
+      const errorMsg = err.message || "Failed to send reset link";
+      setError(errorMsg);
+      toast.error(errorMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { user, loading, error, register, login, logout, forgotPassword, setUser, refreshSession };
 };

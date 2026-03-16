@@ -1,40 +1,51 @@
 "use client";
 
-import { useState } from 'react';
-import PublicLayout from '@/components/layout/PublicLayout';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  CheckCircle2, 
+  ArrowRight, 
+  Loader2 
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Mail, Lock, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { LOGIN_CONTENT } from '@/landing/loginData';
+import { AuthBranding, AuthAlternativeAction, MobileAuthHeader } from '@/components/layout/AuthLayout';
+
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isRegistered = searchParams.get('registered');
-  const { login, loading, error, user } = useAuth();
+  const { login, loading, user } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
 
+  // Centralized redirect logic
   useEffect(() => {
     if (user) {
-      if (user.role === 'customer') {
-        router.push('/customer/chat');
-      } else if (user.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        // Default to business dashboard for business_owner or others
-        router.push('/business/dashboard');
-      }
+      const routes = {
+        customer: '/customer/chat',
+        admin: '/admin/dashboard'
+      };
+      router.push(routes[user.role] || '/business/dashboard');
     }
   }, [user, router]);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -42,103 +53,155 @@ export default function LoginPage() {
     try {
       await login(formData);
     } catch (err) {
-      // Error is caught and accessible via the useAuth `error` state
+      // Error is gracefully handled by the useAuth hook/toast
     }
   };
 
   return (
-    <PublicLayout>
-      <div className="relative flex flex-col items-center justify-center min-h-[85vh] px-6 overflow-hidden">
-        {/* Animated Background Mesh */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-40">
-           <div className="absolute top-[20%] left-[20%] w-72 h-72 bg-[#00D18F] rounded-full mix-blend-multiply filter blur-[100px] animate-blob" />
-           <div className="absolute top-[30%] right-[20%] w-72 h-72 bg-emerald-600 rounded-full mix-blend-multiply filter blur-[100px] animate-blob animation-delay-2000" />
-           <div className="absolute bottom-[20%] left-[40%] w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-[100px] animate-blob animation-delay-4000" />
+    <div className="min-h-screen bg-[#000000] flex flex-col lg:flex-row text-voxy-text font-sans selection:bg-voxy-primary/30 selection:text-white">
+      
+      {/* High Cohesion Branding Column */}
+      <AuthBranding>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A0A0A] border border-voxy-border mb-6">
+          {LOGIN_CONTENT.badge.icon}
+          <span className="text-xs font-medium text-voxy-muted">{LOGIN_CONTENT.badge.text}</span>
         </div>
 
-        <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-          {/* Main Glass Card */}
-          <div className="backdrop-blur-xl bg-zinc-950/60 p-8 sm:p-10 rounded-[2rem] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative before:absolute before:inset-0 before:rounded-[2rem] before:border before:border-white/5 before:-z-10 before:background-glass">
-            
-            {/* Header section */}
-            <div className="flex flex-col items-center mb-10">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#00D18F] to-emerald-400 p-[2px] mb-6 shadow-lg shadow-[#00D18F]/20">
-                <img src="/favicon.jpg" alt="Voxy Logo" className="w-full h-full object-cover rounded-[14px]" />
+        <h1 className="text-[40px] lg:text-[56px] font-sans font-bold leading-[1.1] tracking-tight mb-6 tracking-tight">
+          {LOGIN_CONTENT.heading}
+        </h1>
+        
+        <p className="text-[16px] text-voxy-muted leading-[1.6] max-w-[500px] mb-12">
+          {LOGIN_CONTENT.subheading}
+        </p>
+
+        {/* Value Props Grid */}
+        <div className="grid gap-6 mb-16">
+          {LOGIN_CONTENT.features.map((feature, idx) => (
+            <div key={idx} className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-[#0A0A0A] border border-voxy-border flex items-center justify-center shrink-0">
+                {feature.icon}
               </div>
-              <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-400 text-center tracking-tight">
-                Welcome Back
-              </h1>
-              <p className="mt-2 text-zinc-400/80 text-center text-sm font-medium">Log into your Voxy workspace</p>
+              <div>
+                <h3 className="text-[15px] font-semibold mb-1">{feature.title}</h3>
+                <p className="text-[13px] text-voxy-muted leading-relaxed">{feature.desc}</p>
+              </div>
             </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-5">
+          ))}
+        </div>
 
-              {/* Email Input */}
-              <div className="group relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#00D18F] transition-colors">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <input 
-                  type="email" 
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-11 pr-4 py-3.5 bg-zinc-900/50 border border-white/5 rounded-xl focus:ring-2 focus:ring-[#00D18F]/50 focus:border-[#00D18F] outline-none text-zinc-100 transition-all placeholder:text-zinc-600 font-medium shadow-inner" 
-                  placeholder="Email address" 
-                />
+        {/* Stats Section */}
+        <div className="flex items-center gap-12 border-t border-voxy-border pt-8">
+          {LOGIN_CONTENT.stats.map((stat, idx) => (
+            <div key={idx}>
+              <div className="text-2xl font-bold text-voxy-text mb-1">{stat.value}</div>
+              <div className="text-xs text-voxy-muted">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </AuthBranding>
+
+      {/* Form Column */}
+      <div className="w-full lg:w-[560px] p-4 sm:p-8 flex flex-col items-center justify-center min-h-screen lg:min-h-0">
+        
+        <MobileAuthHeader />
+
+        <div className="w-full max-w-[480px] lg:max-w-none bg-[#0A0A0A] border border-voxy-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl">
+          
+          <div className="mb-8 text-center sm:text-left">
+            {isRegistered && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-voxy-primary/10 border border-voxy-primary/20 mb-4">
+                <CheckCircle2 size={14} className="text-voxy-primary" />
+                <span className="text-xs font-medium text-voxy-primary">Account created successfully!</span>
               </div>
+            )}
+            <h2 className="text-[24px] sm:text-[28px] font-sans font-bold tracking-tight mb-2">Welcome Back</h2>
+            <p className="text-[14px] sm:text-[15px] text-voxy-muted">Sign in to access your Voxy dashboard.</p>
+          </div>
 
-              {/* Password Input */}
-              <div className="group relative">
-                <div className="flex items-center justify-between absolute -top-6 right-0 w-full px-1">
-                  <span /> {/* Spacer */}
-                  <Link href="#" className="text-xs font-semibold text-zinc-500 hover:text-[#00D18F] transition-colors">Recover password?</Link>
-                </div>
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#00D18F] transition-colors">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <input 
-                  type="password" 
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-11 pr-4 py-3.5 bg-zinc-900/50 border border-white/5 rounded-xl focus:ring-2 focus:ring-[#00D18F]/50 focus:border-[#00D18F] outline-none text-zinc-100 transition-all placeholder:text-zinc-600 font-medium shadow-inner" 
-                  placeholder="••••••••"
-                />
-              </div>
+          <Button variant="outline" className="w-full mb-6 bg-[#141414] border-voxy-border hover:bg-[#222222] h-11 transition-all">
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>
+            Continue with Google
+          </Button>
 
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-[#00D18F] to-emerald-500 text-black rounded-xl font-bold hover:shadow-[0_0_20px_rgba(0,209,143,0.4)] transition-all duration-300 mt-6 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 relative overflow-hidden group hover:-translate-y-0.5"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                <span className="relative flex items-center gap-2">
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Authenticating...
-                    </>
-                  ) : (
-                    <>
-                      Sign In <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </span>
-              </button>
-            </form>
-            
-            <div className="mt-8 flex items-center justify-center gap-2 text-sm text-zinc-500 font-medium">
-              <span>New to Voxy?</span>
-              <Link href="/register" className="text-white hover:text-[#00D18F] transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-bottom-right after:scale-x-0 after:bg-[#00D18F] after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100 pb-0.5">
-                Create an account
-              </Link>
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-voxy-border"></span>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#0A0A0A] px-3 text-voxy-muted font-medium tracking-wider">Or sign in with email</span>
             </div>
           </div>
+
+          <form className="space-y-5 mb-8" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-xs text-voxy-muted uppercase tracking-wider">
+                Email Address
+              </Label>
+              <div className="relative group">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-voxy-muted group-focus-within:text-voxy-primary transition-colors" size={16} />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="name@example.com" 
+                  className="pl-10 bg-[#141414] border-transparent focus:border-voxy-primary/50 h-11 transition-all" 
+                  required 
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-xs text-voxy-muted uppercase tracking-wider">Password</Label>
+                <Link href="/forgot-password" size="sm" className="text-xs text-voxy-muted hover:text-voxy-primary transition-colors">Forgot password?</Link>
+              </div>
+              <div className="relative group">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-voxy-muted group-focus-within:text-voxy-primary transition-colors" size={16} />
+                <Input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="••••••••" 
+                  className="pl-10 pr-10 bg-[#141414] border-transparent focus:border-voxy-primary/50 h-11 transition-all" 
+                  required 
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-voxy-muted hover:text-voxy-text transition-colors p-1 rounded-md hover:bg-white/5"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <Button type="submit" disabled={loading} className="w-full h-11 text-[15px] font-semibold mt-2 bg-voxy-primary text-black hover:bg-voxy-primary/90 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-[0_0_20px_rgba(0,209,143,0.1)]">
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  Sign In <ArrowRight size={16} />
+                </div>
+              )}
+            </Button>
+          </form>
+
+          <AuthAlternativeAction 
+            message="New to Voxy?"
+            actionLabel="Create an account"
+            actionHref="/register"
+          />
         </div>
       </div>
-    </PublicLayout>
+
+    </div>
   );
 }

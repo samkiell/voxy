@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useScrolled } from "@/landing/hooks/useScrolled";
 import { useAuth } from "@/hooks/useAuth";
 import { NAV_LINKS } from "@/landing/landingData";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -44,7 +44,7 @@ export default function Navbar() {
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group relative z-50">
           <img src="/favicon.jpg" alt="Voxy Logo" className="w-5 h-5 rounded-full flex-shrink-0 transition-transform group-hover:scale-110 object-cover" />
-          <span className="font-display font-bold text-[18px] tracking-tight text-voxy-text">VOXY</span>
+          <span className="font-sans font-bold text-[18px] tracking-tight text-voxy-text">VOXY</span>
         </Link>
 
         {/* Section links — desktop only */}
@@ -103,60 +103,75 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile menu overlay */}
+        {/* Mobile menu dropdown */}
         <div 
           className={`
-            fixed inset-0 bg-black/95 backdrop-blur-2xl md:hidden transition-all duration-500 flex flex-col items-center justify-center gap-8
-            ${isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"}
+            absolute top-full left-0 right-0 bg-black/95 backdrop-blur-2xl border-b border-white/10 md:hidden transition-all duration-500 ease-in-out origin-top border-t border-white/5 shadow-2xl overflow-hidden
+            ${isMobileMenuOpen ? "max-h-[80vh] opacity-100 scale-y-100" : "max-h-0 opacity-0 scale-y-95 pointer-events-none"}
           `}
         >
-          <div className="flex flex-col items-center gap-6">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-2xl font-bold text-voxy-text hover:text-voxy-primary transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+          <div className="flex flex-col p-6 gap-8">
+            <div className="flex flex-col gap-4">
+              {NAV_LINKS.map((link, idx) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`
+                    text-[15px] font-semibold text-voxy-text hover:text-voxy-primary transition-all duration-300 transform
+                    ${isMobileMenuOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"}
+                  `}
+                  style={{ transitionDelay: `${idx * 50}ms` }}
+                >
+                  <div className="flex items-center justify-between py-2 border-b border-white/5">
+                    {link.label}
+                    <ArrowRight size={14} className="text-voxy-muted/50" />
+                  </div>
+                </Link>
+              ))}
+            </div>
 
-          <div className="flex flex-col items-center gap-4 w-full px-6 pt-6 border-t border-white/10 max-w-xs">
-            {user ? (
-              <Button
-                className="w-full h-14 bg-voxy-primary text-black font-bold text-lg"
-                onClick={() => {
-                  handleDashboardRedirect();
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Go to {user?.role === 'customer' ? 'Chat' : 'Dashboard'}
-              </Button>
-            ) : (
-              <>
+            <div 
+              className={`
+                flex flex-col gap-3 pt-4 transition-all duration-500 transform
+                ${isMobileMenuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}
+              `}
+              style={{ transitionDelay: `${NAV_LINKS.length * 50}ms` }}
+            >
+              {user ? (
                 <Button
-                  variant="ghost"
-                  className="w-full h-14 text-voxy-text border border-white/10 text-lg font-medium"
+                  className="w-full h-12 bg-voxy-primary text-black font-bold text-sm rounded-xl transform active:scale-95 transition-transform"
                   onClick={() => {
-                    router.push("/login");
+                    handleDashboardRedirect();
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Log in
+                  Go to {user?.role === 'customer' ? 'Chat' : 'Dashboard'}
                 </Button>
-                <Button
-                  className="w-full h-14 bg-voxy-primary text-black font-bold text-lg"
-                  onClick={() => {
-                    router.push("/register");
-                    setIsMobileMenuOpen(false);
-                  }}
-                >
-                  Get Started
-                </Button>
-              </>
-            )}
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    className="h-12 text-voxy-text border-white/10 bg-white/5 hover:bg-white/10 text-sm font-medium rounded-xl"
+                    onClick={() => {
+                      router.push("/login");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Log in
+                  </Button>
+                  <Button
+                    className="h-12 bg-voxy-primary text-black font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.2)] active:scale-95 transition-transform"
+                    onClick={() => {
+                      router.push("/register");
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

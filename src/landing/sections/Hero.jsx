@@ -47,7 +47,7 @@ export default function Hero() {
             </Badge>
 
             <div className="space-y-4">
-              <h1 className="font-display text-[40px] sm:text-[58px] leading-[1.1] tracking-tight text-voxy-text">
+              <h1 className="font-sans text-[40px] sm:text-[58px] leading-[1.1] tracking-tight text-voxy-text">
                 {HERO.headline}
                 <br />
                 <span className="text-voxy-muted">{HERO.accent}</span>
