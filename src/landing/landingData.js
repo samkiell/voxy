@@ -8,14 +8,14 @@
  *   nav → hero → problem → howItWorks → features → cta → footer
  */
 
-import { Mic, Sparkles, MessageSquare, Globe, Clock, ShieldCheck, Zap } from "lucide-react";
+import { Mic, Bot, MessageSquare, Globe, Clock, ShieldCheck, Zap } from "lucide-react";
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
 export const NAV_LINKS = [
-    { label: "The Problem", href: "#problem" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Features", href: "#features" },
+    { label: "The Problem", href: "/#problem" },
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "Features", href: "/#features" },
 ];
 
 // Anchor IDs — defined once, referenced by both nav links and section elements
@@ -38,7 +38,7 @@ export const HERO = {
     // The three-step flow rendered in the hero visual
     workflow: [
         { icon: Mic, label: "Voice or Text" },
-        { icon: Sparkles, label: "Voxy AI" },
+        { icon: Bot, label: "Voxy AI" },
         { icon: MessageSquare, label: "Smart Reply" },
     ],
 };
