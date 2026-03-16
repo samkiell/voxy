@@ -33,6 +33,10 @@ CREATE TABLE IF NOT EXISTS businesses (
   category TEXT,
   business_hours JSONB,
   assistant_tone TEXT,
+  assistant_instructions TEXT,
+  custom_category TEXT,
+  profile_completion INTEGER DEFAULT 0,
+  is_live BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
