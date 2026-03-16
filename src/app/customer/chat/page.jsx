@@ -1,15 +1,36 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MessageSquare, ChevronRight, Search, Clock } from 'lucide-react';
-import { MOCK_BUSINESSES, MOCK_CHAT_HISTORY } from '@/lib/mockData';
+import { Plus, MessageSquare, ChevronRight, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function CustomerChatHistoryPage() {
-  const getBusiness = (id) => MOCK_BUSINESSES.find(b => b.id === id);
+  const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/conversations');
+        const data = await res.json();
+        if (data.success) {
+          setConversations(data.conversations);
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        // toast.error('Failed to load chat history');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConversations();
+  }, []);
 
   return (
     <DashboardLayout title="Concierge Hub">
@@ -33,55 +54,42 @@ export default function CustomerChatHistoryPage() {
         </div>
 
         <div className="grid gap-6 px-2">
-          {MOCK_CHAT_HISTORY.length > 0 ? (
-            MOCK_CHAT_HISTORY.map((chat, idx) => {
-              const business = getBusiness(chat.businessId);
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin text-[#00D18F]" />
+            </div>
+          ) : conversations.length > 0 ? (
+            conversations.map((chat, idx) => {
               return (
-                <Link key={chat.businessId} href={`/customer/chat/${chat.businessId}`}>
+                <Link key={chat.id} href={`/customer/chat/${chat.business_id}`}>
                   <div 
                     className="group relative bg-white dark:bg-[#18181b] border border-zinc-100 dark:border-white/5 rounded-[2.5rem] p-6 md:p-8 hover:border-[#00D18F]/30 shadow-sm hover:shadow-2xl hover:shadow-[#00D18F]/5 transition-all duration-500 cursor-pointer animate-in fade-in slide-in-from-bottom-4"
                     style={{ animationDelay: `${idx * 150}ms` }}
                   >
                     <div className="flex items-center gap-6 md:gap-8">
                       <div className="relative">
-                        <div className={`w-20 h-20 md:w-24 md:h-24 rounded-[1.75rem] overflow-hidden ring-8 ring-zinc-50 dark:ring-white/5 shadow-inner group-hover:scale-105 transition-all duration-700`}>
-                          <img 
-                            src={business?.image} 
-                            alt={business?.name}
-                            className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110"
-                          />
+                        <div className={`w-20 h-20 md:w-24 md:h-24 rounded-[1.75rem] overflow-hidden ring-8 ring-zinc-50 dark:ring-white/5 shadow-inner group-hover:scale-105 transition-all duration-700 bg-gradient-to-tr from-[#00D18F]/20 to-[#00A370]/20 flex items-center justify-center`}>
+                          <MessageSquare className="w-10 h-10 text-[#00D18F]" />
                         </div>
-                        {chat.unread > 0 && (
-                          <div className="absolute -top-3 -right-3 bg-[#00D18F] text-white text-[12px] font-black w-8 h-8 rounded-full flex items-center justify-center border-4 border-white dark:border-[#18181b] shadow-2xl animate-bounce">
-                            {chat.unread}
-                          </div>
-                        )}
                       </div>
                       
                       <div className="flex-1 min-w-0 space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <h3 className="font-display font-black text-2xl text-zinc-900 dark:text-white group-hover:text-[#00D18F] transition-colors tracking-tight">
-                              {business?.name}
+                              {chat.business_name || 'Business'}
                             </h3>
                             <Badge className="bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 border-none px-2.5 py-0.5 rounded-full text-[10px] uppercase font-black tracking-widest">
-                              {business?.category}
+                              Concierge
                             </Badge>
                           </div>
                           <span className="text-[10px] text-zinc-400 font-black uppercase tracking-[0.2em]">
-                            {chat.timestamp}
+                            {new Date(chat.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
                         <p className="text-zinc-500 dark:text-zinc-400 text-base font-medium line-clamp-1 max-w-xl group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-                          {chat.lastMessage}
+                          Status: {chat.status}
                         </p>
-                        
-                        <div className="flex items-center gap-4 pt-1">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-[#00D18F]"></div>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-[#00D18F]">Response in 2m</span>
-                          </div>
-                        </div>
                       </div>
 
                       <div className="hidden md:flex items-center justify-center w-14 h-14 rounded-full bg-zinc-50 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-x-6 group-hover:translate-x-0 group-hover:bg-[#00D18F]/10">
