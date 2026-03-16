@@ -176,18 +176,20 @@ export default function ChatInterface({ business }) {
       // Note: Realtime handles updating the state for this message as well!
       // So we don't strictly need setMessages here if subscription works.
       
-      // 3. Simulate AI Response (Should be real later)
+      // 3. Get Real AI Response
       setIsTyping(true);
-      setTimeout(async () => {
-        const aiText = `I've received your inquiry about ${business.name}. I'll help you with that right away! (This is a live AI response)`;
-        
-        await fetch(`/api/conversations/${conversationId}/messages`, {
+      try {
+        await fetch('/api/assistant/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: aiText, senderType: 'ai' })
+          body: JSON.stringify({ conversationId })
         });
-        // Realtime handles state update
-      }, 1000);
+        // Note: Realtime handles updating the UI with the AI's message!
+      } catch (err) {
+        console.error('AI error:', err);
+      } finally {
+        setIsTyping(false);
+      }
 
     } catch (err) {
       console.error('Send error:', err);
