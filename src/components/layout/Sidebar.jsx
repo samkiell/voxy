@@ -71,7 +71,7 @@ export default function Sidebar({ isOpen, onClose }) {
           </button>
         </div>
         
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto py-2 -mx-2 px-2 custom-scrollbar">
           {navItems.map((item) => (
             <Link 
               key={item.name} 
@@ -84,25 +84,26 @@ export default function Sidebar({ isOpen, onClose }) {
             </Link>
           ))}
           
-          <button 
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all group mt-4"
-          >
-            <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform" />
-            <span className="font-semibold">Logout</span>
-          </button>
         </nav>
         
         <div className="pt-6 border-t border-zinc-200 dark:border-white/5 mt-auto">
-          <div className="flex items-center gap-3 px-4">
-            <div className="w-10 h-10 rounded-full bg-[#00D18F] text-black flex items-center justify-center font-bold text-lg shadow-lg shadow-[#00D18F]/20">
+          <div className="flex items-center gap-3 px-2 mb-4">
+            <div className="w-10 h-10 rounded-full bg-[#00D18F] text-black flex items-center justify-center font-bold text-lg shadow-lg shadow-[#00D18F]/20 flex-shrink-0">
               {userDisplayName.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-tighter truncate">{userDisplayName}</div>
-              <div className="text-xs text-zinc-500 font-medium capitalize">{userRoleDisplay.replace('_', ' ')}</div>
+              <div className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-tighter truncate leading-tight">{userDisplayName}</div>
+              <div className="text-[10px] text-zinc-500 font-medium capitalize truncate">{userRoleDisplay.replace('_', ' ')}</div>
             </div>
           </div>
+          
+          <button 
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-all group"
+          >
+            <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-semibold">Logout</span>
+          </button>
         </div>
       </div>
     </>

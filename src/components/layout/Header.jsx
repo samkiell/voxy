@@ -11,7 +11,7 @@ export default function Header({ title, onMenuClick }) {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white tracking-tight truncate max-w-[150px] sm:max-w-none">
+        <h2 className="text-lg sm:text-xl font-display font-bold text-zinc-900 dark:text-white tracking-tight truncate max-w-[150px] sm:max-w-none">
           {title}
         </h2>
       </div>
