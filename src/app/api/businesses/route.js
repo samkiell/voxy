@@ -2,8 +2,23 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getUserFromCookie } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(req) {
   try {
+    const { searchParams } = new URL(req.url);
+    const isPublic = searchParams.get('public') === 'true';
+
+    // 1. PUBLIC QUERY: Fetch all verified/live businesses
+    if (isPublic) {
+      const result = await db.query(
+        'SELECT id, name, description, category, custom_category, profile_completion, is_live FROM businesses WHERE is_live = true'
+      );
+      return NextResponse.json({ 
+        success: true, 
+        businesses: result.rows 
+      });
+    }
+
+    // 2. PRIVATE QUERY: Fetch owner's specific business
     const user = await getUserFromCookie();
     if (!user) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
