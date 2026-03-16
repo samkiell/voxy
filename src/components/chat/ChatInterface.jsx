@@ -41,18 +41,11 @@ const SUGGESTED_QUERIES = [
 
 export default function ChatInterface({ business }) {
   const router = useRouter();
-  const INITIAL_MESSAGE = {
-    id: 1,
-    role: "ai",
-    content: `Welcome to ${business?.name || "Luxe Diners"}! I'm your AI concierge. I can help you with reservations, menu enquiries, or any other questions you may have in any language. How can I assist you today?`,
-    timestamp: "09:00 AM",
-    status: "read",
-  };
-
-  const [messages, setMessages] = useState([INITIAL_MESSAGE]);
+  const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState("English");
+  const [conversationId, setConversationId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -63,76 +56,110 @@ export default function ChatInterface({ business }) {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSendMessage = (e) => {
-    if (e) e.preventDefault();
-    if (!inputValue.trim()) return;
+  // 1. Initial Data Fetching & Conversation Setup
+  useEffect(() => {
+    if (!business?.id) return;
 
-    const userMessage = {
-      id: messages.length + 1,
-      role: "user",
-      content: inputValue,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      status: "sent",
+    const initChat = async () => {
+      try {
+        setLoading(true);
+        // Try to find or create conversation
+        const res = await fetch('/api/conversations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ businessId: business.id })
+        });
+        const data = await res.json();
+        
+        if (data.success && data.id) {
+          setConversationId(data.id);
+          
+          // Fetch existing messages
+          const msgRes = await fetch(`/api/conversations/${data.id}/messages`);
+          const msgData = await msgRes.json();
+          if (msgData.success && msgData.messages.length > 0) {
+            setMessages(msgData.messages.map(m => ({
+              id: m.id,
+              role: m.sender_type,
+              content: m.content,
+              timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              status: 'read'
+            })));
+          } else {
+            // Send initial welcome message if new
+            const welcome = `Welcome to ${business.name}! I'm your AI concierge. How can I assist you today?`;
+            setMessages([{
+              id: 'welcome',
+              role: 'ai',
+              content: welcome,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              status: 'read'
+            }]);
+          }
+        }
+      } catch (err) {
+        console.error('Chat init error:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setMessages([...messages, userMessage]);
+    initChat();
+  }, [business?.id]);
+
+  const handleSendMessage = async (e) => {
+    if (e) e.preventDefault();
+    if (!inputValue.trim() || !conversationId) return;
+
+    const text = inputValue;
     setInputValue("");
 
-    // Simulate AI response
-    setIsTyping(true);
-    setTimeout(() => {
-      let aiResponseContent = "";
-
-      // Basic mock logic
-      if (
-        inputValue.toLowerCase().includes("table") ||
-        inputValue.toLowerCase().includes("reservation")
-      ) {
-        aiResponseContent =
-          "I'd be happy to check availability for you! We have a few slots open for tonight at 7:30 PM and 8:15 PM. For how many people should I make the reservation?";
-      } else if (
-        inputValue.toLowerCase().includes("hola") ||
-        inputValue.toLowerCase().includes("spanish") ||
-        inputValue.toLowerCase().includes("espanol")
-      ) {
-        aiResponseContent =
-          `¡Claro que sí! Puedo ayudarte en español. ¿En qué puedo servirle con relación a ${business?.name || "Luxe Diners"} oggi?`;
-      } else if (
-        inputValue.toLowerCase().includes("how far") ||
-        inputValue.toLowerCase().includes("wetin") ||
-        inputValue.toLowerCase().includes("pidgin")
-      ) {
-        aiResponseContent =
-          `How far boss! I dey here to help you for anythin' you need for ${business?.name || "Luxe Diners"}. You wan reserve table or check wetin dey the menu?`;
-      } else if (
-        inputValue.toLowerCase().includes("ekaro") ||
-        inputValue.toLowerCase().includes("yoruba") ||
-        inputValue.toLowerCase().includes("bawo")
-      ) {
-        aiResponseContent =
-          `E nle o! Mo le ran yin lowo ni ede Yoruba. Se e fe mo nipa ${business?.name || "Luxe Diners"} wa tabi e fe se ifi pamọ fun tabili?`;
-      } else {
-        aiResponseContent =
-          `That's a great question about ${business?.name || "Luxe Diners"}. Our current specialties include the Truffle Infused Risotto and the Wagyu Beef Tartare. Would you like to see our full menu?`;
+    // 2. Save Customer Message
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: text, senderType: 'customer' })
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        setMessages(prev => [...prev, {
+          id: data.message.id,
+          role: 'customer',
+          content: text,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          status: 'sent'
+        }]);
       }
 
-      const aiResponse = {
-        id: messages.length + 2,
-        role: "ai",
-        content: aiResponseContent,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        status: "read",
-      };
+      // 3. Simulate AI Response (Should be real later)
+      setIsTyping(true);
+      setTimeout(async () => {
+        const aiText = `I've received your inquiry about ${business.name}. I'll help you with that right away! (This is a live AI response)`;
+        
+        const aiRes = await fetch(`/api/conversations/${conversationId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: aiText, senderType: 'ai' })
+        });
+        const aiData = await aiRes.json();
 
-      setMessages((prev) => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 1500);
+        if (aiData.success) {
+          setMessages(prev => [...prev, {
+            id: aiData.message.id,
+            role: 'ai',
+            content: aiText,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'read'
+          }]);
+        }
+        setIsTyping(false);
+      }, 1000);
+
+    } catch (err) {
+      console.error('Send error:', err);
+    }
   };
 
   const handleSuggestedClick = (text) => {
