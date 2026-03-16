@@ -68,7 +68,7 @@ export default function Navbar() {
           <Button
             size="sm"
             className="bg-voxy-primary text-black font-semibold hover:bg-voxy-primary/90"
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/register")}
           >
             Get Started
           </Button>

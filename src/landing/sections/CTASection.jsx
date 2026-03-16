@@ -40,7 +40,7 @@ export default function CTASection() {
           <Button
             size="lg"
             className="gap-2 bg-voxy-primary text-black font-semibold hover:bg-voxy-primary/90 shadow-[0_0_15px_rgba(16,185,129,0.25)] text-[15px]"
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/register")}
           >
             {CTA.primaryCTA} <ArrowRight size={16} />
           </Button>
