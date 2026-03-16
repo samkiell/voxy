@@ -20,7 +20,7 @@ export default function Footer() {
 
         {/* Brand */}
         <div className="flex items-center gap-2.5">
-          <div className="w-4 h-4 rounded-full bg-voxy-primary flex-shrink-0" />
+          <img src="/favicon.jpg" alt="Voxy Logo" className="size-8 rounded-lg object-cover" />
           <span className="font-bold text-[16px] tracking-tight text-voxy-text">
             {FOOTER.brand}
           </span>

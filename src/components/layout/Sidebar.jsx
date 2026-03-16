@@ -5,27 +5,45 @@ import {
   MessageSquare, 
   BarChart3, 
   Building2, 
-  Globe, 
   Settings,
-  LogOut
+  LogOut,
+  Users
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function Sidebar() {
   const { logout, user } = useAuth();
+  const role = user?.role || 'customer';
 
-  const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Assistant', href: '/assistant', icon: Bot },
-    { name: 'Conversations', href: '/conversations', icon: MessageSquare },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'Business', href: '/business', icon: Building2 },
-    { name: 'Languages', href: '/languages', icon: Globe },
-    { name: 'Settings', href: '/settings', icon: Settings },
-  ];
+  const getNavItems = () => {
+    if (role === 'admin') {
+      return [
+        { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+        { name: 'Users', href: '/admin/users', icon: Users },
+        { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+        { name: 'Settings', href: '/admin/settings', icon: Settings },
+      ];
+    } else if (role === 'customer') {
+      return [
+        { name: 'Chat', href: '/customer/chat', icon: MessageSquare },
+        { name: 'Find Business', href: '/customer/find-business', icon: Building2 },
+        { name: 'Bookmarks', href: '/customer/bookmarks', icon: Bot },
+        { name: 'Settings', href: '/customer/settings', icon: Settings },
+      ];
+    } else {
+      // business_owner or default business role
+      return [
+        { name: 'Dashboard', href: '/business/dashboard', icon: LayoutDashboard },
+        { name: 'Conversations', href: '/business/conversation', icon: MessageSquare },
+        { name: 'Settings', href: '/business/settings', icon: Settings },
+      ];
+    }
+  };
 
-  const userDisplayName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'SAMKIEL';
-  const userRole = user?.user_metadata?.role || 'Administrator';
+  const navItems = getNavItems();
+
+  const userDisplayName = user?.name || user?.email?.split('@')[0] || 'User';
+  const userRoleDisplay = role === 'business_owner' ? 'Business' : role;
 
   return (
     <div className="w-64 bg-zinc-50 dark:bg-black text-zinc-500 dark:text-zinc-400 min-h-screen p-6 flex flex-col border-r border-zinc-200 dark:border-white/5 transition-colors">
@@ -62,7 +80,7 @@ export default function Sidebar() {
           </div>
           <div>
             <div className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-tighter truncate w-32">{userDisplayName}</div>
-            <div className="text-xs text-zinc-500 font-medium capitalize">{userRole.replace('_', ' ')}</div>
+            <div className="text-xs text-zinc-500 font-medium capitalize">{userRoleDisplay.replace('_', ' ')}</div>
           </div>
         </div>
       </div>

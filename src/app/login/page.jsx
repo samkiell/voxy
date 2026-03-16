@@ -22,7 +22,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/dashboard');
+      if (user.role === 'customer') {
+        router.push('/customer/chat');
+      } else if (user.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        // Default to business dashboard for business_owner or others
+        router.push('/business/dashboard');
+      }
     }
   }, [user, router]);
 

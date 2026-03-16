@@ -18,11 +18,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useScrolled } from "@/landing/hooks/useScrolled";
+import { useAuth } from "@/hooks/useAuth";
 import { NAV_LINKS } from "@/landing/landingData";
 
 export default function Navbar() {
+  const { user } = useAuth();
   const router = useRouter();
   const scrolled = useScrolled(12);
+
+  const handleDashboardRedirect = () => {
+    if (!user) return;
+    if (user.role === 'customer') {
+      router.push('/customer/chat');
+    } else if (user.role === 'admin') {
+      router.push('/admin/dashboard');
+    } else {
+      router.push('/business/dashboard');
+    }
+  };
 
   return (
     <header
@@ -57,21 +70,33 @@ export default function Navbar() {
 
         {/* Auth CTAs */}
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="hidden md:inline-flex text-voxy-muted hover:text-voxy-text"
-            onClick={() => router.push("/login")}
-          >
-            Log in
-          </Button>
-          <Button
-            size="sm"
-            className="bg-voxy-primary text-black font-semibold hover:bg-voxy-primary/90"
-            onClick={() => router.push("/register")}
-          >
-            Get Started
-          </Button>
+          {user ? (
+            <Button
+              size="sm"
+              className="bg-voxy-primary text-black font-semibold hover:bg-voxy-primary/90"
+              onClick={handleDashboardRedirect}
+            >
+              Go to {user?.role === 'customer' ? 'Chat' : 'Dashboard'}
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden md:inline-flex text-voxy-muted hover:text-voxy-text"
+                onClick={() => router.push("/login")}
+              >
+                Log in
+              </Button>
+              <Button
+                size="sm"
+                className="bg-voxy-primary text-black font-semibold hover:bg-voxy-primary/90"
+                onClick={() => router.push("/register")}
+              >
+                Get Started
+              </Button>
+            </>
+          )}
         </div>
 
       </nav>

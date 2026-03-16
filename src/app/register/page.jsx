@@ -21,7 +21,13 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/login');
+      if (user.role === 'customer') {
+        router.push('/customer/chat');
+      } else if (user.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/business/dashboard');
+      }
     }
   }, [user, router]);
 
@@ -37,7 +43,7 @@ export default function RegisterPage() {
     e.preventDefault();
     try {
       await register(formData);
-      router.push('/login?registered=true');
+      // user object will be updated by useAuth, triggering the useEffect above
     } catch (err) {
       // Error is handled via the useAuth hook's toast and state
     }
