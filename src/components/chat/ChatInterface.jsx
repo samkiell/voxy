@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Send, 
-  Mic, 
-  MoreVertical, 
-  Paperclip, 
-  Smile, 
-  CheckCheck, 
-  Clock, 
-  Bot, 
+import React, { useState, useEffect, useRef } from "react";
+
+import {
+  Send,
+  Mic,
+  MoreVertical,
+  Paperclip,
+  Smile,
+  CheckCheck,
+  Clock,
+  Bot,
   User,
   Sparkles,
   RefreshCcw,
@@ -17,33 +18,41 @@ import {
   Calendar,
   Utensils,
   MapPin,
-  Info
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-
-const MOCK_MESSAGES = [
-  {
-    id: 1,
-    role: 'ai',
-    content: "Welcome to Luxe Diners! I'm your AI concierge. I can help you with reservations, menu enquiries, or any other questions you may have in any language. How can I assist you today?",
-    timestamp: '09:00 AM',
-    status: 'read'
-  }
-];
+  Info,
+  ChevronLeft,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const SUGGESTED_QUERIES = [
   { icon: <Calendar className="w-4 h-4" />, text: "Book a table for tonight" },
-  { icon: <Utensils className="w-4 h-4" />, text: "What's on the chef's special menu?" },
-  { icon: <MapPin className="w-4 h-4" />, text: "Where is the nearest parking?" },
-  { icon: <Languages className="w-4 h-4" />, text: "Can you speak Spanish?" }
+  {
+    icon: <Utensils className="w-4 h-4" />,
+    text: "What's on the chef's special menu?",
+  },
+  {
+    icon: <MapPin className="w-4 h-4" />,
+    text: "Where is the nearest parking?",
+  },
+  { icon: <Languages className="w-4 h-4" />, text: "Can you speak Spanish?" },
 ];
 
-export default function ChatInterface() {
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
-  const [inputValue, setInputValue] = useState('');
+export default function ChatInterface({ business }) {
+  const router = useRouter();
+  const INITIAL_MESSAGE = {
+    id: 1,
+    role: "ai",
+    content: `Welcome to ${business?.name || "Luxe Diners"}! I'm your AI concierge. I can help you with reservations, menu enquiries, or any other questions you may have in any language. How can I assist you today?`,
+    timestamp: "09:00 AM",
+    status: "read",
+  };
+
+  const [messages, setMessages] = useState([INITIAL_MESSAGE]);
+  const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('English');
+  const [currentLanguage, setCurrentLanguage] = useState("English");
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -60,42 +69,68 @@ export default function ChatInterface() {
 
     const userMessage = {
       id: messages.length + 1,
-      role: 'user',
+      role: "user",
       content: inputValue,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: 'sent'
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      status: "sent",
     };
 
     setMessages([...messages, userMessage]);
-    setInputValue('');
-    
+    setInputValue("");
+
     // Simulate AI response
     setIsTyping(true);
     setTimeout(() => {
       let aiResponseContent = "";
-      
+
       // Basic mock logic
-      if (inputValue.toLowerCase().includes('table') || inputValue.toLowerCase().includes('reservation')) {
-        aiResponseContent = "I'd be happy to check availability for you! We have a few slots open for tonight at 7:30 PM and 8:15 PM. For how many people should I make the reservation?";
-      } else if (inputValue.toLowerCase().includes('hola') || inputValue.toLowerCase().includes('spanish') || inputValue.toLowerCase().includes('espanol')) {
-        aiResponseContent = "¡Claro que sí! Puedo ayudarte en español. ¿En qué puedo servirle con relación a Luxe Diners oggi?";
-      } else if (inputValue.toLowerCase().includes('how far') || inputValue.toLowerCase().includes('wetin') || inputValue.toLowerCase().includes('pidgin')) {
-        aiResponseContent = "How far boss! I dey here to help you for anythin' you need for Luxe Diners. You wan reserve table or check wetin dey the menu?";
-      } else if (inputValue.toLowerCase().includes('ekaro') || inputValue.toLowerCase().includes('yoruba') || inputValue.toLowerCase().includes('bawo')) {
-        aiResponseContent = "E nle o! Mo le ran yin lowo ni ede Yoruba. Se e fe mo nipa menu wa tabi e fe se ifi pamọ fun tabili?";
+      if (
+        inputValue.toLowerCase().includes("table") ||
+        inputValue.toLowerCase().includes("reservation")
+      ) {
+        aiResponseContent =
+          "I'd be happy to check availability for you! We have a few slots open for tonight at 7:30 PM and 8:15 PM. For how many people should I make the reservation?";
+      } else if (
+        inputValue.toLowerCase().includes("hola") ||
+        inputValue.toLowerCase().includes("spanish") ||
+        inputValue.toLowerCase().includes("espanol")
+      ) {
+        aiResponseContent =
+          `¡Claro que sí! Puedo ayudarte en español. ¿En qué puedo servirle con relación a ${business?.name || "Luxe Diners"} oggi?`;
+      } else if (
+        inputValue.toLowerCase().includes("how far") ||
+        inputValue.toLowerCase().includes("wetin") ||
+        inputValue.toLowerCase().includes("pidgin")
+      ) {
+        aiResponseContent =
+          `How far boss! I dey here to help you for anythin' you need for ${business?.name || "Luxe Diners"}. You wan reserve table or check wetin dey the menu?`;
+      } else if (
+        inputValue.toLowerCase().includes("ekaro") ||
+        inputValue.toLowerCase().includes("yoruba") ||
+        inputValue.toLowerCase().includes("bawo")
+      ) {
+        aiResponseContent =
+          `E nle o! Mo le ran yin lowo ni ede Yoruba. Se e fe mo nipa ${business?.name || "Luxe Diners"} wa tabi e fe se ifi pamọ fun tabili?`;
       } else {
-        aiResponseContent = "That's a great question about Luxe Diners. Our current specialties include the Truffle Infused Risotto and the Wagyu Beef Tartare. Would you like to see our full menu?";
+        aiResponseContent =
+          `That's a great question about ${business?.name || "Luxe Diners"}. Our current specialties include the Truffle Infused Risotto and the Wagyu Beef Tartare. Would you like to see our full menu?`;
       }
 
       const aiResponse = {
         id: messages.length + 2,
-        role: 'ai',
+        role: "ai",
         content: aiResponseContent,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        status: 'read'
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        status: "read",
       };
-      
-      setMessages(prev => [...prev, aiResponse]);
+
+      setMessages((prev) => [...prev, aiResponse]);
       setIsTyping(false);
     }, 1500);
   };
@@ -105,86 +140,133 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-full max-h-[800px] bg-white dark:bg-zinc-950 rounded-3xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-800 transition-all duration-300">
+    <div className="flex flex-col h-full max-h-[850px] bg-white dark:bg-[#09090b] rounded-[3rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-zinc-200 dark:border-white/5 transition-all duration-500">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-900 bg-white/50 dark:bg-zinc-950/50 backdrop-blur-md z-10">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-400 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-              <Bot className="w-7 h-7" />
+      <div className="flex items-center justify-between px-8 py-6 border-b border-zinc-100 dark:border-white/5 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-2xl z-20">
+        <div className="flex items-center gap-5">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/customer/chat')}
+            className="rounded-full hover:bg-zinc-100 dark:hover:bg-white/10 -ml-2"
+          >
+            <ChevronLeft className="w-6 h-6 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white" />
+          </Button>
+
+          <Link 
+            href={`/customer/business/${business?.id}`}
+            className="flex items-center gap-4 group cursor-pointer"
+          >
+            <div className="relative">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-2xl group-hover:scale-105 transition-all duration-500 ring-4 ring-zinc-50 dark:ring-white/5 group-hover:ring-[#00D18F]/20">
+                {business?.image ? (
+                  <img src={business.image} alt={business.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-tr from-[#00D18F] to-[#00A370] flex items-center justify-center text-white">
+                    <Bot className="w-8 h-8" />
+                  </div>
+                )}
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 bg-[#00D18F] border-4 border-white dark:border-[#09090b] rounded-full shadow-lg"></div>
             </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-zinc-950 rounded-full ring-4 ring-emerald-500/10"></div>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-bold text-lg text-zinc-900 dark:text-zinc-100">Luxe AI Concierge</h2>
-              <Badge variant="outline" className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 text-[10px] py-0 px-2 font-semibold tracking-wider uppercase">Online</Badge>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="font-display font-black text-xl text-zinc-900 dark:text-white group-hover:text-[#00D18F] transition-colors tracking-tight">
+                  {business?.name || "Luxe AI"}
+                </h2>
+                <Badge
+                  className="bg-[#00D18F]/10 text-[#00D18F] border-none text-[10px] py-0.5 px-2.5 font-black tracking-widest uppercase rounded-full"
+                >
+                  Live
+                </Badge>
+              </div>
+              <p className="text-[xs] text-zinc-500 dark:text-zinc-400 flex items-center gap-2 font-semibold">
+                <span className="w-2 h-2 rounded-full bg-[#00D18F] animate-pulse"></span>
+                AI Assistant • {business?.category || "Concierge"}
+              </p>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Fast response in any language
-            </p>
-          </div>
+          </Link>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-[1.25rem] hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all shadow-sm"
+          >
             <RefreshCcw className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
-            <Info className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-[1.25rem] hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all shadow-sm"
+          >
             <MoreVertical className="w-5 h-5" />
           </Button>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#18181b_1px,transparent_1px)] [background-size:24px_24px]">
+      <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide bg-[#fcfcfd] dark:bg-[#09090b] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:32px_32px]">
         {messages.map((msg) => (
-          <div 
-            key={msg.id} 
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-500`}
+          <div
+            key={msg.id}
+            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out`}
           >
-            <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center ${
-                msg.role === 'ai' 
-                  ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/10' 
-                  : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'
-              }`}>
-                {msg.role === 'ai' ? <Sparkles className="w-4 h-4" /> : <User className="w-4 h-4" />}
+            <div
+              className={`flex gap-4 max-w-[85%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+            >
+              <div
+                className={`w-11 h-11 rounded-[1.25rem] flex-shrink-0 flex items-center justify-center shadow-xl ${
+                  msg.role === "ai"
+                    ? "bg-[#00D18F] text-white shadow-[#00D18F]/20"
+                    : "bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-100 dark:border-white/5 shadow-zinc-200/50"
+                }`}
+              >
+                {msg.role === "ai" ? (
+                  <Sparkles className="w-5 h-5 fill-white/20" />
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
               </div>
-              
+
               <div className="group relative">
-                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm transition-all duration-200 ${
-                  msg.role === 'user'
-                    ? 'bg-emerald-600 text-white rounded-tr-none'
-                    : 'bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-tl-none'
-                }`}>
+                <div
+                  className={`px-6 py-4 rounded-[2rem] text-[16px] leading-[1.6] shadow-xl transition-all duration-500 ${
+                    msg.role === "user"
+                      ? "bg-[#00D18F] text-white rounded-tr-none shadow-[#00D18F]/20 hover:shadow-[#00D18F]/30"
+                      : "bg-white dark:bg-[#18181b] border border-zinc-100 dark:border-white/5 text-zinc-800 dark:text-zinc-100 rounded-tl-none hover:shadow-2xl hover:shadow-zinc-200/50 dark:hover:shadow-black/40"
+                  }`}
+                >
                   {msg.content}
                 </div>
-                <div className={`flex items-center gap-1.5 mt-1.5 px-1 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-tight">{msg.timestamp}</span>
-                  {msg.role === 'user' && (
-                    <CheckCheck className={`w-3.5 h-3.5 ${msg.status === 'read' ? 'text-blue-500' : 'text-zinc-400'}`} />
+                <div
+                  className={`flex items-center gap-2 mt-2.5 px-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em]">
+                    {msg.timestamp}
+                  </span>
+                  {msg.role === "user" && (
+                    <CheckCheck
+                      className={`w-4 h-4 ${msg.status === "read" ? "text-[#00D18F]" : "text-zinc-300 dark:text-zinc-700"}`}
+                    />
                   )}
                 </div>
               </div>
             </div>
           </div>
         ))}
-        
+
         {isTyping && (
-          <div className="flex justify-start animate-in fade-in duration-300">
-            <div className="flex gap-3 max-w-[80%]">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
-                <Sparkles className="w-4 h-4" />
+          <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-500">
+            <div className="flex gap-4 max-w-[80%]">
+              <div className="w-11 h-11 rounded-[1.25rem] bg-[#00D18F] text-white flex items-center justify-center shadow-xl shadow-[#00D18F]/20">
+                <Sparkles className="w-5 h-5 animate-pulse" />
               </div>
-              <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 px-4 py-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce"></span>
+              <div className="bg-white dark:bg-[#18181b] border border-zinc-100 dark:border-white/5 px-6 py-4 rounded-[2rem] rounded-tl-none shadow-xl flex items-center gap-2.5">
+                <span className="w-2 h-2 bg-[#00D18F] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-2 h-2 bg-[#00D18F] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-2 h-2 bg-[#00D18F] rounded-full animate-bounce"></span>
               </div>
             </div>
           </div>
@@ -194,14 +276,14 @@ export default function ChatInterface() {
 
       {/* Suggested Queries */}
       {messages.length < 3 && !isTyping && (
-        <div className="px-6 py-2 overflow-x-auto no-scrollbar flex items-center gap-2 bg-transparent">
+        <div className="px-8 py-5 overflow-x-auto no-scrollbar flex items-center gap-3 bg-transparent">
           {SUGGESTED_QUERIES.map((query, idx) => (
             <button
               key={idx}
               onClick={() => handleSuggestedClick(query.text)}
-              className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 text-xs font-medium text-zinc-600 dark:text-zinc-400"
+              className="flex-shrink-0 flex items-center gap-2.5 px-6 py-3 rounded-full border border-zinc-200 dark:border-white/5 bg-white/60 dark:bg-zinc-900/40 backdrop-blur-xl hover:bg-[#00D18F] hover:text-white dark:hover:bg-[#00D18F] hover:border-[#00D18F] transition-all duration-300 text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400 shadow-sm"
             >
-              {query.icon}
+              <span className="opacity-70 group-hover:opacity-100">{query.icon}</span>
               {query.text}
             </button>
           ))}
@@ -209,58 +291,84 @@ export default function ChatInterface() {
       )}
 
       {/* Input Area */}
-      <div className="p-6 bg-white dark:bg-zinc-950 transition-all duration-300">
-        <form 
+      <div className="p-8 pb-10 bg-white dark:bg-[#09090b] border-t border-zinc-100 dark:border-white/5 transition-all duration-500">
+        <form
           onSubmit={handleSendMessage}
-          className="relative group bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500/50 transition-all duration-300 shadow-inner"
+          className="relative group bg-[#f8f9fa] dark:bg-[#18181b] border border-zinc-200 dark:border-white/5 rounded-[2.5rem] focus-within:ring-[8px] focus-within:ring-[#00D18F]/5 focus-within:border-[#00D18F]/30 focus-within:bg-white dark:focus-within:bg-[#18181b] transition-all duration-500 shadow-inner"
         >
-          <div className="flex items-center px-4 py-2 min-h-[56px]">
-            <Button type="button" variant="ghost" size="icon" className="text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
-              <Paperclip className="w-5 h-5" />
+          <div className="flex items-center px-5 py-4 min-h-[72px]">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-zinc-400 hover:text-[#00D18F] dark:hover:text-[#00D18F] transition-all rounded-[1.25rem] hover:bg-white dark:hover:bg-zinc-800"
+            >
+              <Paperclip className="w-6 h-6" />
             </Button>
-            
+
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask anything about our business..."
-              className="flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400"
+              placeholder={`Message ${business?.name || "AI"}...`}
+              className="flex-1 bg-transparent border-none outline-none px-6 py-2 text-[17px] text-zinc-900 dark:text-white placeholder:text-zinc-400 font-medium"
             />
-            
-            <div className="flex items-center gap-1.5">
-              <Button type="button" variant="ghost" size="icon" className="hidden sm:inline-flex text-zinc-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
-                <Smile className="w-5 h-5" />
-              </Button>
-              <div className="w-[1px] h-6 bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block"></div>
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="icon" 
-                className={`transition-all duration-300 ${inputValue.trim() ? 'hidden' : 'inline-flex text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl'}`}
+
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="hidden sm:inline-flex text-zinc-400 hover:text-[#00D18F] dark:hover:text-[#00D18F] transition-all rounded-[1.25rem] hover:bg-white dark:hover:bg-zinc-800"
               >
-                <Mic className="w-5 h-5" />
+                <Smile className="w-6 h-6" />
               </Button>
-              <Button 
-                type="submit" 
-                disabled={!inputValue.trim()}
-                className={`transition-all duration-300 rounded-xl px-4 flex items-center gap-2 group/btn ${
-                  inputValue.trim() 
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 active:scale-95' 
-                    : 'hidden'
-                }`}
-              >
-                <span className="text-xs font-semibold uppercase tracking-wider">Send</span>
-                <Send className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-              </Button>
+              <div className="w-[1.5px] h-8 bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block"></div>
+              
+              {!inputValue.trim() ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="bg-[#00D18F]/10 text-[#00D18F] hover:bg-[#00D18F]/20 rounded-[1.25rem] size-12 shadow-sm animate-in zoom-in-50 duration-300"
+                >
+                  <Mic className="w-6 h-6" />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className="bg-[#00D18F] hover:bg-[#00A370] text-white rounded-[1.25rem] size-12 flex items-center justify-center shadow-2xl shadow-[#00D18F]/40 active:scale-90 transition-all duration-300 animate-in slide-in-from-right-2"
+                >
+                  <Send className="w-5 h-5 fill-white" />
+                </Button>
+              )}
             </div>
           </div>
         </form>
-        <p className="mt-3 text-[10px] text-zinc-400 text-center uppercase tracking-widest font-medium opacity-60">
-          Powered by Voxy AI • Multilingual Support
-        </p>
+        
+        <div className="mt-6 flex items-center justify-between px-4">
+          <div className="flex items-center gap-3 opacity-30 group-hover:opacity-50 transition-opacity">
+            <p className="text-[10px] text-zinc-400 font-black uppercase tracking-[0.3em]">
+              Voxy Intelligence Agent
+            </p>
+          </div>
+          <div className="flex items-center gap-2 opacity-20">
+            <div className="w-1.5 h-1.5 rounded-full bg-zinc-400"></div>
+            <p className="text-[9px] text-zinc-400 font-black uppercase tracking-[0.2em]">
+              E2E Encrypted
+            </p>
+          </div>
+        </div>
       </div>
-      
+
       <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
