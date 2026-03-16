@@ -29,28 +29,24 @@ export default function SettingsPage() {
     const fetchBusiness = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('businesses')
-          .select('*')
-          .eq('owner_id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') throw error;
+        const res = await fetch('/api/businesses');
+        const data = await res.json();
         
-        if (data) {
-          setBusiness(data);
+        if (data.success && data.business) {
+          const biz = data.business;
+          setBusiness(biz);
           setFormData({
-            name: data.name,
-            description: data.description,
-            category: data.category,
-            custom_category: data.custom_category
+            name: biz.name,
+            description: biz.description,
+            category: biz.category,
+            custom_category: biz.custom_category
           });
-          setHours(data.business_hours || {});
+          setHours(biz.business_hours || {});
           setConfig({
-            assistant_tone: data.assistant_tone,
-            assistant_instructions: data.assistant_instructions
+            assistant_tone: biz.assistant_tone,
+            assistant_instructions: biz.assistant_instructions
           });
-          setCompletion(data.profile_completion || 0);
+          setCompletion(biz.profile_completion || 0);
         }
       } catch (err) {
         console.error('Fetch error:', err);
@@ -84,36 +80,31 @@ export default function SettingsPage() {
       const newCompletion = calculateCompletion(formData, hours, config);
       const isLive = newCompletion >= 80;
 
-      const updateData = {
+      const payload = {
         ...formData,
         assistant_tone: config.assistant_tone,
         assistant_instructions: config.assistant_instructions,
         business_hours: hours,
         profile_completion: newCompletion,
-        is_live: isLive,
-        owner_id: user.id, // Ensure owner_id is set
-        updated_at: new Date().toISOString()
+        is_live: isLive
       };
 
-      let result;
-      if (business?.id) {
-        result = await supabase
-          .from('businesses')
-          .update(updateData)
-          .eq('id', business.id);
-      } else {
-        result = await supabase
-          .from('businesses')
-          .insert(updateData);
-      }
+      const res = await fetch('/api/businesses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-      if (result.error) throw result.error;
+      const data = await res.json();
       
+      if (!data.success) throw new Error(data.error || 'Failed to save');
+      
+      setBusiness(data.business);
       setCompletion(newCompletion);
       toast.success('Settings saved successfully!');
     } catch (err) {
       console.error('Save error:', err);
-      toast.error('Failed to save settings');
+      toast.error(err.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }

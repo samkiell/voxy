@@ -1,41 +1,89 @@
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
-import { getUserFromRequest } from '@/lib/auth';
+import db from '@/lib/db';
+import { getUserFromCookie } from '@/lib/auth';
 
-export async function GET(req) {
+export async function GET() {
   try {
-    const user = getUserFromRequest(req);
-    // In a real app, you might want to protect this route
-    // if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getUserFromCookie();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
 
-    // Placeholder Logic: Fetch businesses for the user or all businesses
-    // const results = await query('SELECT * FROM businesses');
-    
-    const businesses = [
-      { id: 1, name: "Voxy AI Solutions", sector: "Tech" },
-      { id: 2, name: "VoiceConnect", sector: "Communication" }
-    ];
+    const result = await db.query(
+      'SELECT * FROM businesses WHERE owner_id = $1',
+      [user.id]
+    );
 
-    return NextResponse.json({ success: true, data: businesses });
+    return NextResponse.json({ 
+      success: true, 
+      business: result.rows[0] || null 
+    });
   } catch (error) {
+    console.error('API Error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { name, sector } = body;
+    const user = await getUserFromCookie();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
 
-    // Placeholder Logic: Insert into DB
-    // const result = await query('INSERT INTO businesses (name, sector) VALUES ($1, $2) RETURNING *', [name, sector]);
+    const body = await req.json();
+    const { 
+      name, description, category, custom_category, 
+      assistant_tone, assistant_instructions, business_hours,
+      profile_completion, is_live 
+    } = body;
+
+    // Check if business exists
+    const existing = await db.query(
+      'SELECT id FROM businesses WHERE owner_id = $1',
+      [user.id]
+    );
+
+    let result;
+    if (existing.rowCount > 0) {
+      // Update
+      result = await db.query(
+        `UPDATE businesses SET 
+          name = $1, description = $2, category = $3, 
+          custom_category = $4, assistant_tone = $5, 
+          assistant_instructions = $6, business_hours = $7,
+          profile_completion = $8, is_live = $9,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE owner_id = $10 RETURNING *`,
+        [
+          name, description, category, custom_category, 
+          assistant_tone, assistant_instructions, JSON.stringify(business_hours),
+          profile_completion, is_live, user.id
+        ]
+      );
+    } else {
+      // Insert
+      result = await db.query(
+        `INSERT INTO businesses (
+          owner_id, name, description, category, 
+          custom_category, assistant_tone, assistant_instructions, 
+          business_hours, profile_completion, is_live
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+        [
+          user.id, name, description, category, 
+          custom_category, assistant_tone, assistant_instructions, 
+          JSON.stringify(business_hours), profile_completion, is_live
+        ]
+      );
+    }
 
     return NextResponse.json({ 
       success: true, 
-      message: "Business created", 
-      data: { id: Date.now(), name, sector } 
-    }, { status: 201 });
+      message: "Business settings saved", 
+      business: result.rows[0] 
+    });
   } catch (error) {
+    console.error('API Error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
