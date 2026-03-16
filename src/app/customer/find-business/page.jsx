@@ -5,7 +5,7 @@ import Link from 'next/link';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Star, MessageSquare, MapPin, Loader2 } from 'lucide-react';
+import { Search, Star, MessageSquare, MapPin, Loader2, Bot } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function FindBusinessPage() {
