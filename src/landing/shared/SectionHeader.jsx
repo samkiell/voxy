@@ -24,7 +24,7 @@ export default function SectionHeader({ eyebrow, headline, body, align = "center
       {eyebrow && (
         <span className="eyebrow">{eyebrow}</span>
       )}
-      <h2 className="font-display text-3xl sm:text-4xl text-voxy-text leading-tight">
+      <h2 className="font-sans font-bold text-3xl sm:text-4xl text-voxy-text leading-tight">
         {headline}
       </h2>
       {body && (

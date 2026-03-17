@@ -39,7 +39,7 @@ export default function ProblemSection() {
               className="voxy-card rounded-none p-8 flex flex-col gap-3 hover:border-voxy-primary/30 hover:-translate-y-1 hover:bg-white/[0.015]"
             >
               <span
-                className="font-display text-[52px] leading-none text-voxy-primary"
+                className="font-sans text-[52px] font-bold leading-none text-voxy-primary"
                 aria-label={stat.value}
               >
                 {stat.value}

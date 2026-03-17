@@ -1,187 +1,226 @@
 "use client";
 
-import { useState } from 'react';
-import PublicLayout from '@/components/layout/PublicLayout';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { 
+  Building2, 
+  Mail, 
+  Lock, 
+  User,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  ArrowRight,
+  Loader2
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Mail, Lock, User, ArrowRight, Briefcase, Users } from 'lucide-react';
-import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { SIGNUP_CONTENT } from '@/landing/signupData';
+import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { AuthBranding, AuthAlternativeAction, MobileAuthHeader } from '@/components/layout/AuthLayout';
 
-export default function RegisterPage() {
+export default function Signup() {
   const router = useRouter();
-  const { register, loading, error, user } = useAuth();
+  const { register, loading } = useAuth();
+  const { passwordError, isPasswordValid, validatePassword } = usePasswordValidation();
   
+  const [role, setRole] = useState('customer'); 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    role: 'customer'
+    password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      if (user.role === 'customer') {
-        router.push('/customer/chat');
-      } else if (user.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/business/dashboard');
-      }
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+    
+    if (id === 'password') {
+      validatePassword(value);
     }
-  }, [user, router]);
-
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleRoleSelect = (role) => {
-    setFormData(prev => ({ ...prev, role }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isPasswordValid) return;
+    
     try {
-      await register(formData);
+      await register({
+        ...formData,
+        role: role
+      });
       router.push('/login?registered=true');
     } catch (err) {
-      // Error is handled via the useAuth hook's toast and state
+      // Error handled by useAuth via toast
     }
   };
 
+  const currentContent = SIGNUP_CONTENT[role];
+
   return (
-    <PublicLayout>
-      <div className="relative flex flex-col items-center justify-center min-h-[85vh] px-6 overflow-hidden py-12">
-        {/* Animated Background Mesh */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-40">
-           <div className="absolute top-[30%] right-[30%] w-80 h-80 bg-[#00D18F] rounded-full mix-blend-multiply filter blur-[120px] animate-blob" />
-           <div className="absolute top-[40%] left-[25%] w-72 h-72 bg-emerald-600 rounded-full mix-blend-multiply filter blur-[100px] animate-blob animation-delay-2000" />
-           <div className="absolute bottom-[10%] content-center w-96 h-96 bg-teal-500/50 rounded-full mix-blend-multiply filter blur-[120px] animate-blob animation-delay-4000" />
+    <div className="min-h-screen bg-[#000000] flex flex-col lg:flex-row text-voxy-text font-sans selection:bg-voxy-primary/30 selection:text-white">
+      
+      {/* Left Column */}
+      <AuthBranding>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A0A0A] border border-voxy-border mb-6">
+          <div className="w-1.5 h-1.5 rounded-full bg-voxy-primary"></div>
+          <span className="text-xs font-medium text-voxy-muted">{currentContent.badge}</span>
         </div>
 
-        <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-          {/* Main Glass Card */}
-          <div className="backdrop-blur-xl bg-zinc-950/60 p-8 sm:p-10 rounded-[2rem] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative before:absolute before:inset-0 before:rounded-[2rem] before:border before:border-white/5 before:-z-10 before:background-glass">
-            
-            {/* Header section */}
-            <div className="flex flex-col items-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#00D18F] to-emerald-400 p-[2px] mb-6 shadow-lg shadow-[#00D18F]/20">
-                <img src="/favicon.jpg" alt="Voxy Logo" className="w-full h-full object-cover rounded-[14px]" />
-              </div>
-              <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-400 text-center tracking-tight">
-                Create Account
-              </h1>
-              <p className="mt-2 text-zinc-400/80 text-center text-sm font-medium">Join Voxy and supercharge your workflow</p>
+        <h1 className="text-[40px] lg:text-[56px] font-sans font-bold leading-[1.1] tracking-tight mb-6 tracking-tight">
+          {currentContent.heading}
+        </h1>
+        
+        <p className="text-[16px] text-voxy-muted leading-[1.6] max-w-[500px] mb-12">
+          {currentContent.subheading}
+        </p>
+
+        {/* Features Grid */}
+        <div className="grid sm:grid-cols-2 gap-4 mb-16">
+          {currentContent.features.map((feature, idx) => (
+            <div key={idx} className="bg-[#0A0A0A] p-5 rounded-xl border border-transparent hover:border-voxy-border transition-colors">
+              {feature.icon}
+              <h3 className="text-[15px] font-semibold mb-2">{feature.title}</h3>
+              <p className="text-[13px] text-voxy-muted leading-relaxed">{feature.desc}</p>
             </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              
-              {/* Role Selection */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <button
-                  type="button"
-                  onClick={() => handleRoleSelect('customer')}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-300 ${
-                    formData.role === 'customer' 
-                      ? 'bg-[#00D18F]/10 border-[#00D18F] text-[#00D18F]' 
-                      : 'bg-zinc-900/50 border-white/5 text-zinc-500 hover:border-white/10'
-                  }`}
-                >
-                  <Users className="w-5 h-5" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Customer</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRoleSelect('business_owner')}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-300 ${
-                    formData.role === 'business_owner' 
-                      ? 'bg-[#00D18F]/10 border-[#00D18F] text-[#00D18F]' 
-                      : 'bg-zinc-900/50 border-white/5 text-zinc-500 hover:border-white/10'
-                  }`}
-                >
-                  <Briefcase className="w-5 h-5" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Business</span>
-                </button>
-              </div>
+          ))}
+        </div>
 
-              {/* Name Input */}
-              <div className="group relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#00D18F] transition-colors">
-                  <User className="h-5 w-5" />
-                </div>
-                <input 
-                  type="text" 
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-11 pr-4 py-3.5 bg-zinc-900/50 border border-white/5 rounded-xl focus:ring-2 focus:ring-[#00D18F]/50 focus:border-[#00D18F] outline-none text-zinc-100 transition-all placeholder:text-zinc-600 font-medium shadow-inner" 
-                  placeholder="Full Name" 
-                />
-              </div>
-
-              {/* Email Input */}
-              <div className="group relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#00D18F] transition-colors">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <input 
-                  type="email" 
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-11 pr-4 py-3.5 bg-zinc-900/50 border border-white/5 rounded-xl focus:ring-2 focus:ring-[#00D18F]/50 focus:border-[#00D18F] outline-none text-zinc-100 transition-all placeholder:text-zinc-600 font-medium shadow-inner" 
-                  placeholder="Email address" 
-                />
-              </div>
-
-              {/* Password Input */}
-              <div className="group relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-[#00D18F] transition-colors">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <input 
-                  type="password" 
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-11 pr-4 py-3.5 bg-zinc-900/50 border border-white/5 rounded-xl focus:ring-2 focus:ring-[#00D18F]/50 focus:border-[#00D18F] outline-none text-zinc-100 transition-all placeholder:text-zinc-600 font-medium shadow-inner" 
-                  placeholder="Create a password"
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-[#00D18F] to-emerald-500 text-black rounded-xl font-bold hover:shadow-[0_0_20px_rgba(0,209,143,0.4)] transition-all duration-300 mt-6 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 relative overflow-hidden group hover:-translate-y-0.5"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                <span className="relative flex items-center gap-2">
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Creating Account...
-                    </>
-                  ) : (
-                    <>
-                      Sign Up <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </span>
-              </button>
-            </form>
-            
-            <div className="mt-8 flex items-center justify-center gap-2 text-sm text-zinc-500 font-medium">
-              <span>Already have an account?</span>
-              <Link href="/login" className="text-white hover:text-[#00D18F] transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-bottom-right after:scale-x-0 after:bg-[#00D18F] after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100 pb-0.5">
-                Sign in instead
-              </Link>
+        {/* Stats */}
+        <div className="flex items-center gap-12 border-t border-voxy-border pt-8">
+          {currentContent.stats.map((stat, idx) => (
+            <div key={idx}>
+              <div className="text-2xl font-bold text-voxy-text mb-1">{stat.value}</div>
+              <div className="text-xs text-voxy-muted">{stat.label}</div>
             </div>
+          ))}
+        </div>
+      </AuthBranding>
+
+      {/* Right Column - Form */}
+      <div className="w-full lg:w-[560px] p-4 sm:p-8 flex flex-col items-center justify-center min-h-screen lg:min-h-0 relative max-h-[1000px] z-10">
+        
+        <MobileAuthHeader />
+
+        <div className="w-full max-w-[480px] lg:max-w-none bg-[#0A0A0A] border border-voxy-border rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl relative z-10">
+          <div className="mb-8 text-left">
+            <h2 className="text-[24px] sm:text-[28px] font-sans font-bold tracking-tight mb-2">Create an account</h2>
+            <p className="text-[14px] sm:text-[15px] text-voxy-muted">{currentContent.formSubheading}</p>
           </div>
+
+          {/* Role Switching Tabs */}
+          <div className="flex bg-[#141414] p-1 rounded-lg mb-8 border border-voxy-border">
+            <button 
+              onClick={() => setRole('business_owner')}
+              className={`flex-1 text-sm font-medium py-2 rounded-md transition-all flex items-center justify-center gap-2 ${role === 'business_owner' ? 'bg-[#222222] text-voxy-text shadow-sm' : 'text-voxy-muted hover:text-voxy-text'}`}
+            >
+              <Building2 size={16} /> Business
+            </button>
+            <button 
+              onClick={() => setRole('customer')}
+              className={`flex-1 text-sm font-medium py-2 rounded-md transition-all flex items-center justify-center gap-2 ${role === 'customer' ? 'bg-[#222222] text-voxy-text shadow-sm' : 'text-voxy-muted hover:text-voxy-text'}`}
+            >
+              <User size={16} /> Customer
+            </button>
+          </div>
+
+          <form className="space-y-5 mb-8" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-xs text-voxy-muted uppercase tracking-wider">
+                {role === 'business_owner' ? 'Company Name' : 'Full Name'}
+              </Label>
+              <div className="relative">
+                {role === 'business_owner' ? (
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-voxy-muted" size={16} />
+                ) : (
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-voxy-muted" size={16} />
+                )}
+                <Input 
+                  id="name" 
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder={role === 'business_owner' ? "Acme Corp" : "Jane Doe"} 
+                  className="pl-10 bg-[#141414] border-transparent focus:border-voxy-primary/50 h-11" 
+                  required 
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-xs text-voxy-muted uppercase tracking-wider">
+                {role === 'business_owner' ? 'Work Email' : 'Email Address'}
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-voxy-muted" size={16} />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder={role === 'business_owner' ? "work@company.com" : "jane@example.com"} 
+                  className="pl-10 bg-[#141414] border-transparent focus:border-voxy-primary/50 h-11" 
+                  required 
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-xs text-voxy-muted uppercase tracking-wider">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-voxy-muted" size={16} />
+                <Input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="••••••••" 
+                  className={`pl-10 pr-10 bg-[#141414] h-11 transition-colors ${
+                    isPasswordValid ? 'border-voxy-primary focus:border-voxy-primary focus:ring-voxy-primary/20' : 
+                    passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 
+                    'border-transparent focus:border-voxy-primary/50'
+                  }`} 
+                  required 
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-voxy-muted hover:text-voxy-text transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {passwordError && (
+                <p className="text-xs text-red-500 mt-1 leading-relaxed">{passwordError}</p>
+              )}
+            </div>
+
+            <Button type="submit" disabled={loading} className="w-full h-11 text-[15px] font-semibold mt-2 bg-voxy-primary text-black hover:bg-voxy-primary/90 transition-all hover:scale-[1.01] active:scale-[0.99]">
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+              ) : (
+                <>Create {role === 'business_owner' ? 'Business' : 'Customer'} Account</>
+              )}
+            </Button>
+          </form>
+
+          <div className="flex items-start gap-2 mb-8">
+            <CheckCircle2 className="text-voxy-primary shrink-0 mt-0.5" size={16} />
+            <p className="text-sm text-voxy-muted leading-relaxed">
+              {currentContent.privacyNotice}
+            </p>
+          </div>
+
+          <AuthAlternativeAction 
+            message="Already have an account?"
+            actionLabel="Sign in"
+            actionHref="/login"
+          />
         </div>
       </div>
-    </PublicLayout>
+    </div>
   );
 }

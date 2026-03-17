@@ -109,7 +109,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight transition-colors duration-500;
+    @apply font-sans tracking-tight transition-colors duration-500;
   }
 
   /* Custom Smooth Scrollbar */
