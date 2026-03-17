@@ -164,11 +164,27 @@ export default function ChatInterface({ business, userName }) {
 
         setIsTyping(true);
         try {
-          await fetch('/api/assistant/chat', {
+          const aiRes = await fetch('/api/assistant/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ conversationId })
           });
+          const aiData = await aiRes.json();
+          
+          if (aiData.success && aiData.message) {
+            // Add the AI message directly if it's not already there from Realtime
+            const aiMsg = aiData.message;
+            setMessages(prev => {
+              if (prev.find(m => m.id === aiMsg.id)) return prev;
+              return [...prev, {
+                id: aiMsg.id,
+                role: aiMsg.sender_type,
+                content: aiMsg.content,
+                timestamp: new Date(aiMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                status: 'read'
+              }];
+            });
+          }
         } catch (err) {
           console.error('AI error:', err);
         } finally {
