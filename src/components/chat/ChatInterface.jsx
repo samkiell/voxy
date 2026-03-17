@@ -116,9 +116,24 @@ export default function ChatInterface({ business, userName }) {
         (payload) => {
           const newMessage = payload.new;
           setMessages(prev => {
-            // ... (deduplication logic remains)
             if (prev.find(m => m.id === newMessage.id)) return prev;
-            // ... (rest of deduplication)
+            
+            const tempMatch = prev.find(m => 
+              m.id?.toString().startsWith('temp-') && 
+              m.content === newMessage.content && 
+              m.role === newMessage.sender_type
+            );
+
+            if (tempMatch) {
+              return prev.map(m => m.id === tempMatch.id ? {
+                id: newMessage.id,
+                role: newMessage.sender_type,
+                content: newMessage.content,
+                timestamp: new Date(newMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                status: 'read'
+              } : m);
+            }
+
             return [...prev, {
               id: newMessage.id,
               role: newMessage.sender_type,
