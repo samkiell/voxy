@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
+import { supabase } from './supabase';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-change-this';
 const TOKEN_NAME = 'voxy_auth_token';
@@ -70,4 +71,44 @@ export const getUserFromCookie = async () => {
   if (!token) return null;
   
   return verifyToken(token);
+};
+
+// --- Compatibility for Supabase-style Auth ---
+
+/**
+ * Sign in using Supabase Auth
+ */
+export const signIn = async (email, password) => {
+  return await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+};
+
+/**
+ * Sign up using Supabase Auth
+ */
+export const signUp = async (email, password, metadata = {}) => {
+  return await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: metadata,
+    },
+  });
+};
+
+/**
+ * Alias for getUserFromCookie
+ */
+export const getUser = async () => {
+  return await getUserFromCookie();
+};
+
+/**
+ * Get user from request (generic wrapper for getUserFromCookie)
+ */
+export const getUserFromRequest = async (req) => {
+  // In Next.js App Router, we usually just use cookies() directly
+  return await getUserFromCookie();
 };
