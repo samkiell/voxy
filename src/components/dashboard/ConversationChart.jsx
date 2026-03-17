@@ -20,81 +20,89 @@ const ConversationChart = ({ data, timeRange, setTimeRange }) => {
     import('recharts').then(() => {
       setIsRechartsLoaded(true);
     }).catch(() => {
-      setIsRechartsLoaded(false);
+// Keep false
     });
   }, []);
 
   return (
-    <div className="bg-zinc-900/50 border border-white/10 p-6 rounded-2xl shadow-xl backdrop-blur-md">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+    <div className="bg-[#111111] border border-white/5 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#00D18F]/5 blur-[100px] rounded-full pointer-events-none" />
+      
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 relative z-10">
         <div>
-          <h2 className="text-xl font-bold text-white">Conversation Activity</h2>
-          <p className="text-zinc-400 text-sm">Monitor your message volume over time</p>
+          <h2 className="text-2xl font-display font-black text-white italic tracking-tight">Activity <span className="text-[#00D18F]">Insights</span></h2>
+          <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1 opacity-60">Message volume overview</p>
         </div>
         
-        <div className="flex bg-zinc-800/50 p-1 rounded-lg self-start">
+        <div className="flex bg-white/[0.03] p-1.5 rounded-2xl self-start border border-white/5">
           {['24h', '7d', '30d'].map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${
                 timeRange === range 
-                  ? 'bg-zinc-700 text-white shadow-lg' 
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-[#00D18F] text-black shadow-lg shadow-[#00D18F]/20' 
+                  : 'text-zinc-500 hover:text-white'
               }`}
             >
-              {range === '24h' ? 'Last 24h' : range === '7d' ? 'Last 7 Days' : 'Last 30 Days'}
+              {range === '24h' ? '24h' : range === '7d' ? '7 Days' : '30 Days'}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="h-[350px] w-full">
+      <div className="h-[320px] w-full relative z-10">
         {isRechartsLoaded && data && data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+              <CartesianGrid strokeDasharray="8 8" stroke="rgba(255,255,255,0.03)" vertical={false} />
               <XAxis 
                 dataKey="name" 
-                stroke="#71717a" 
-                fontSize={12} 
+                stroke="#3f3f46" 
+                fontSize={10} 
                 tickLine={false} 
                 axisLine={false}
+                tick={{ fontWeight: 800, letterSpacing: '0.1em' }}
               />
               <YAxis 
-                stroke="#71717a" 
-                fontSize={12} 
+                stroke="#3f3f46" 
+                fontSize={10} 
                 tickLine={false} 
                 axisLine={false}
                 allowDecimals={false}
+                tick={{ fontWeight: 800 }}
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: '#18181b', 
+                  backgroundColor: '#000', 
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '12px',
-                  color: '#fff'
+                  borderRadius: '16px',
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                  padding: '12px 16px'
                 }}
-                itemStyle={{ color: '#00D18F' }}
+                itemStyle={{ color: '#00D18F', fontWeight: 900, fontSize: '12px', textTransform: 'uppercase' }}
+                cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 2 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="count" 
                 stroke="#00D18F" 
-                strokeWidth={3}
-                dot={{ fill: '#00D18F', strokeWidth: 2, r: 4, stroke: '#18181b' }}
-                activeDot={{ r: 6, strokeWidth: 0 }}
+                strokeWidth={5}
+                dot={{ fill: '#00D18F', strokeWidth: 4, r: 6, stroke: '#111111' }}
+                activeDot={{ r: 8, strokeWidth: 0, fill: '#fff' }}
+                animationDuration={2000}
               />
             </LineChart>
           </ResponsiveContainer>
         ) : !isRechartsLoaded ? (
-          <div className="flex flex-col items-center justify-center h-full text-zinc-500 gap-2 border border-dashed border-white/10 rounded-xl">
-            <p className="text-sm font-medium">Chart visualization pending...</p>
-            <p className="text-xs text-zinc-600 max-w-[200px] text-center">Please ensure 'recharts' is installed or wait for background processes to complete.</p>
+          <div className="flex flex-col items-center justify-center h-full text-zinc-500 gap-4 border-2 border-dashed border-white/5 rounded-3xl">
+            <div className="size-12 rounded-full border-4 border-[#00D18F]/20 border-t-[#00D18F] animate-spin" />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em]">Initializing Engine</p>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full text-zinc-500 italic">
-            No activity data available for this period.
+          <div className="flex flex-col items-center justify-center h-full text-zinc-600 space-y-4">
+            <div className="w-16 h-1 bg-white/5 rounded-full" />
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-500">No activity detected</p>
           </div>
         )}
       </div>

@@ -1,16 +1,28 @@
 import React from 'react';
-import { MessageSquare, Users, CheckCircle, AlertCircle } from 'lucide-react';
+import { MessageSquare, Users, CheckCircle, AlertCircle, ArrowUpRight } from 'lucide-react';
 
-const StatsCard = ({ title, value, description, icon: Icon, colorClass }) => (
-  <div className="bg-zinc-900/50 border border-white/10 p-6 rounded-2xl shadow-xl backdrop-blur-md">
-    <div className="flex items-center justify-between mb-4">
-      <div className={`p-2 rounded-lg ${colorClass}`}>
-        <Icon size={24} />
+const StatsCard = ({ title, value, description, icon: Icon, colorClass, gradientClass }) => (
+  <div className="relative group overflow-hidden bg-[#111111] border border-white/5 p-8 rounded-[2.5rem] shadow-2xl transition-all duration-700 hover:border-[#00D18F]/30 hover:-translate-y-1">
+    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${gradientClass} opacity-0 group-hover:opacity-10 transition-opacity duration-700 blur-2xl`} />
+    
+    <div className="relative z-10 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className={`p-4 rounded-2xl ${colorClass} bg-opacity-10 shadow-inner`}>
+          <Icon size={24} className="group-hover:scale-110 transition-transform duration-500" />
+        </div>
+        <div className="p-2 rounded-full border border-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+           <ArrowUpRight size={14} className="text-zinc-500" />
+        </div>
+      </div>
+      
+      <div>
+        <h3 className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{title}</h3>
+        <p className="text-4xl font-display font-black text-white italic tracking-tighter">{value}</p>
+        <div className="flex items-center gap-2 mt-3">
+          <span className="text-[10px] font-bold text-zinc-600 truncate">{description}</span>
+        </div>
       </div>
     </div>
-    <h3 className="text-zinc-400 text-sm font-medium">{title}</h3>
-    <p className="text-3xl font-bold text-white mt-1">{value}</p>
-    <p className="text-zinc-500 text-xs mt-2">{description}</p>
   </div>
 );
 
@@ -19,30 +31,34 @@ const StatsCards = ({ stats }) => {
     {
       title: 'Total Conversations',
       value: stats?.total || 0,
-      description: 'Cumulative total conversations',
+      description: 'Cumulative engagements',
       icon: MessageSquare,
-      colorClass: 'bg-blue-500/10 text-blue-400',
+      colorClass: 'text-blue-400 bg-blue-400',
+      gradientClass: 'from-blue-500 to-transparent'
     },
     {
-      title: 'Active Conversations Today',
+      title: 'Active Today',
       value: stats?.activeToday || 0,
-      description: 'Conversations with activity today',
+      description: 'Conversations active now',
       icon: Users,
-      colorClass: 'bg-purple-500/10 text-purple-400',
+      colorClass: 'text-purple-400 bg-purple-400',
+      gradientClass: 'from-purple-500 to-transparent'
     },
     {
-      title: 'AI Resolved Conversations',
+      title: 'AI Resolved',
       value: stats?.aiResolved || 0,
-      description: 'Handled entirely by AI',
+      description: 'Fully handled by AI',
       icon: CheckCircle,
-      colorClass: 'bg-emerald-500/10 text-emerald-400',
+      colorClass: 'text-[#00D18F] bg-[#00D18F]',
+      gradientClass: 'from-[#00D18F] to-transparent'
     },
     {
-      title: 'Owner Interventions',
+      title: 'Interventions',
       value: stats?.ownerInterventions || 0,
-      description: 'Owner replied at least once',
+      description: 'Human-assisted responses',
       icon: AlertCircle,
-      colorClass: 'bg-orange-500/10 text-orange-400',
+      colorClass: 'text-orange-400 bg-orange-400',
+      gradientClass: 'from-orange-500 to-transparent'
     },
   ];
 
