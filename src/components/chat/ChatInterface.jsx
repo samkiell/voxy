@@ -217,7 +217,7 @@ export default function ChatInterface({ business, userName }) {
             className="flex items-center gap-5 group cursor-pointer"
           >
             <div className="relative">
-              <div className="size-16 rounded-[1.5rem] bg-gradient-to-tr from-[#00D18F]/20 to-emerald-400/20 flex items-center justify-center text-[#00D18F] font-black text-2xl border border-[#00D18F]/10 shadow-2xl group-hover:scale-110 transition-transform duration-500">
+              <div className="size-16 rounded-2xl bg-[#00D18F]/10 flex items-center justify-center text-[#00D18F] font-bold text-2xl border border-[#00D18F]/10 shadow-sm transition-transform duration-500">
                 <Bot className="w-8 h-8" />
               </div>
               <div className="absolute -bottom-1 -right-1 p-1 bg-black rounded-lg border border-white/5">
@@ -226,7 +226,7 @@ export default function ChatInterface({ business, userName }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-display font-black text-2xl text-white group-hover:text-[#00D18F] transition-colors tracking-tight italic leading-tight">
+                <h2 className="font-display font-bold text-2xl text-white group-hover:text-[#00D18F] transition-colors tracking-tight leading-tight">
                   {business?.name || "Merchant"}
                 </h2>
                 <Badge className="bg-[#00D18F]/10 text-[#00D18F] border-none text-[8px] py-1 px-2.5 font-black tracking-widest uppercase rounded-lg">Concierge</Badge>
@@ -264,8 +264,8 @@ export default function ChatInterface({ business, userName }) {
               <div className="space-y-2">
                 <div className={`px-6 py-4 rounded-[2rem] text-[15px] leading-relaxed shadow-2xl transition-all duration-700 hover:scale-[1.01] ${
                   msg.role === "customer"
-                    ? "bg-gradient-to-tr from-[#00D18F] to-emerald-400 text-black font-bold rounded-tr-[0.5rem] shadow-[#00D18F]/10"
-                    : "bg-white/[0.03] text-zinc-100 border border-white/[0.05] rounded-tl-[0.5rem] backdrop-blur-3xl"
+                    ? "bg-[#00D18F] text-black font-bold rounded-tr-[0.5rem] shadow-sm"
+                    : "bg-white/[0.03] text-zinc-100 border border-white/[0.05] rounded-tl-[0.5rem]"
                 }`}>
                   {msg.content}
                 </div>

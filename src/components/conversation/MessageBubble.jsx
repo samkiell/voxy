@@ -21,30 +21,26 @@ const MessageBubble = ({ message, senderType }) => {
           }`}>
             {isAI ? <Bot size={12} /> : <User size={12} />}
           </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
             {getSenderLabel()}
           </span>
-          <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">
+          <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">
             {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
 
-        <div className={`relative px-6 py-4 rounded-[2rem] text-[15px] leading-relaxed shadow-2xl transition-all duration-700 hover:scale-[1.01] ${
+        <div className={`relative px-6 py-4 rounded-[2rem] text-[15px] leading-relaxed shadow-lg transition-all duration-700 hover:scale-[1.01] ${
           isOwner 
-            ? 'bg-gradient-to-tr from-[#00D18F] to-emerald-400 text-black font-bold rounded-tr-[0.5rem] shadow-[#00D18F]/10' 
-            : 'bg-white/[0.03] text-zinc-100 border border-white/[0.05] rounded-tl-[0.5rem] backdrop-blur-3xl'
+            ? 'bg-[#00D18F] text-black font-bold rounded-tr-[0.5rem]' 
+            : 'bg-white/[0.03] text-zinc-100 border border-white/[0.05] rounded-tl-[0.5rem]'
         }`}>
           {message.content}
           
           {isOwner && (
             <div className="absolute -bottom-5 right-2 flex items-center gap-1 opacity-40">
                <Check size={10} className="text-[#00D18F]" />
-               <span className="text-[8px] font-black uppercase tracking-widest text-[#00D18F]">Delivered</span>
+               <span className="text-[8px] font-bold uppercase tracking-wider text-[#00D18F]">Delivered</span>
             </div>
-          )}
-
-          {isAI && (
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-[#00D18F]/20 to-transparent blur-sm rounded-full" />
           )}
         </div>
       </div>

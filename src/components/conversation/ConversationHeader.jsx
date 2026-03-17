@@ -21,7 +21,7 @@ const ConversationHeader = ({ customerName, status, startTime }) => {
       
       <div className="flex items-center gap-6 relative z-10">
         <div className="relative">
-          <div className="size-16 rounded-[1.5rem] bg-gradient-to-tr from-[#00D18F]/20 to-emerald-400/20 flex items-center justify-center text-[#00D18F] font-black text-2xl border border-[#00D18F]/10 shadow-2xl">
+          <div className="size-16 rounded-2xl bg-[#00D18F]/10 flex items-center justify-center text-[#00D18F] font-bold text-2xl border border-[#00D18F]/10">
             {customerName?.charAt(0) || 'C'}
           </div>
           <div className="absolute -bottom-1 -right-1 p-1 bg-black rounded-lg border border-white/5">
@@ -29,10 +29,10 @@ const ConversationHeader = ({ customerName, status, startTime }) => {
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-display font-black text-white italic tracking-tight group-hover:text-[#00D18F] transition-colors leading-tight">
+          <h1 className="text-2xl font-display font-bold text-white tracking-tight leading-tight uppercase tracking-tighter">
             {customerName || 'Anonymous Customer'}
           </h1>
-          <div className="flex items-center gap-3 text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1 opacity-60">
+          <div className="flex items-center gap-3 text-zinc-500 text-[10px] font-bold uppercase tracking-wider mt-1">
             <Clock size={12} className="text-[#00D18F]/60" />
             Started {startTime ? new Date(startTime).toLocaleTimeString() : 'Recently'}
           </div>
@@ -40,7 +40,7 @@ const ConversationHeader = ({ customerName, status, startTime }) => {
       </div>
 
       <div className="flex items-center relative z-10">
-        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${getStatusStyles(status)} transition-all shadow-xl`}>
+        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border ${getStatusStyles(status)} transition-all`}>
           {status}
         </span>
       </div>

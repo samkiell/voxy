@@ -2,42 +2,11 @@
 
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Search, Filter, Languages, Volume2, ChevronRight, MessageSquare } from 'lucide-react';
+import { Search, Filter, Languages, Volume2, ChevronRight, MessageSquare, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export default function ConversationsPage() {
-  const [conversations] = useState([
-    {
-      id: 1,
-      name: "Ayo Williams",
-      snippet: "Eku ale o, I want to confirm my order for tomorrow.",
-      language: "YORUBA",
-      time: "10:24 AM",
-      sentiment: "Positive",
-      status: "AUTO-REPLIED",
-      statusColor: "bg-emerald-500/10 text-emerald-500"
-    },
-    {
-      id: 2,
-      name: "Chidi",
-      snippet: "How much is the delivery to Lekki Phase 1?",
-      language: "PIDGIN",
-      time: "09:45 AM",
-      sentiment: "Neutral",
-      status: "MANUAL REVIEW",
-      statusColor: "bg-amber-500/10 text-amber-500"
-    },
-    {
-      id: 3,
-      name: "Sarah",
-      snippet: "Thank you for the quick response! Very helpful.",
-      language: "ENGLISH",
-      time: "YESTERDAY",
-      sentiment: "Positive",
-      status: "RESOLVED",
-      statusColor: "bg-zinc-500/10 text-zinc-500"
-    }
-  ]);
+  const [conversations] = useState([]);
 
   return (
     <DashboardLayout title="Conversations">
