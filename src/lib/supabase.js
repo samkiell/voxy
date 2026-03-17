@@ -16,3 +16,8 @@ export const getServiceSupabase = () => {
   }
   return createClient(supabaseUrl, serviceKey);
 };
+
+// Aliases for compatibility with different API routes
+export const createAdminClient = getServiceSupabase;
+export const getAdminDb = getServiceSupabase;
+export const getDb = () => supabase;
