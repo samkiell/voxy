@@ -10,21 +10,16 @@ const pool = new Pool({
 
 async function checkAllSchema() {
   try {
-    const tables = ['businesses', 'conversations', 'messages', 'users', 'customers'];
-    for (const table of tables) {
-      const res = await pool.query(`
-        SELECT column_name, data_type 
-        FROM information_schema.columns 
-        WHERE table_schema = 'public' AND table_name = $1
-        ORDER BY column_name
-      `, [table]);
-      console.log(`\n--- Table: ${table} ---`);
-      if (res.rows.length === 0) {
-        console.log('No columns found (table might not exist).');
-      } else {
-        res.rows.forEach(row => console.log(`${row.column_name.padEnd(25)} | ${row.data_type}`));
-      }
-    }
+    const res = await pool.query(`
+      SELECT id, name, email, role
+      FROM users
+      ORDER BY name, email
+    `);
+    console.log('--- Current Users ---');
+    res.rows.forEach(row => {
+      const slugVal = (row.name || row.email).toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
+      console.log(`${row.id.substring(0, 8)} | ${row.name || 'N/A'} | ${row.email} | Predicted Slug: ${slugVal}`);
+    });
     process.exit(0);
   } catch (err) {
     console.error('Error checking schema:', err);

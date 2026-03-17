@@ -76,7 +76,21 @@ export default function ConversationPage({ params }) {
         },
         (payload) => {
           setMessages((prev) => {
+            // If already exists, skip
             if (prev.find(m => m.id === payload.new.id)) return prev;
+
+            // Check if there's a temporary message that matches this one
+            const tempMatch = prev.find(m => 
+              m.id?.toString().startsWith('temp-') && 
+              m.content === payload.new.content && 
+              m.sender_type === payload.new.sender_type
+            );
+
+            if (tempMatch) {
+              // Replace it
+              return prev.map(m => m.id === tempMatch.id ? payload.new : m);
+            }
+
             return [...prev, payload.new];
           });
           if (payload.new.sender_type === 'ai') setIsAiTyping(false);

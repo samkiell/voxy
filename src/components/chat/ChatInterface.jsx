@@ -114,7 +114,27 @@ export default function ChatInterface({ business, userName }) {
         (payload) => {
           const newMessage = payload.new;
           setMessages(prev => {
+            // If already exists, skip
             if (prev.find(m => m.id === newMessage.id)) return prev;
+
+            // Check if there's a temporary message that matches this one
+            const tempMatch = prev.find(m => 
+              m.id?.toString().startsWith('temp-') && 
+              m.content === newMessage.content && 
+              m.role === newMessage.sender_type
+            );
+
+            if (tempMatch) {
+              // Replace it
+              return prev.map(m => m.id === tempMatch.id ? {
+                id: newMessage.id,
+                role: newMessage.sender_type,
+                content: newMessage.content,
+                timestamp: new Date(newMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                status: 'sent'
+              } : m);
+            }
+
             return [...prev, {
               id: newMessage.id,
               role: newMessage.sender_type,
@@ -149,7 +169,7 @@ export default function ChatInterface({ business, userName }) {
     const channel = supabase.channel(`chat:${conversationId}`);
 
     try {
-      const tempId = Date.now().toString();
+      const tempId = 'temp-' + Date.now();
       setMessages(prev => [...prev, {
         id: tempId,
         role: 'customer',
