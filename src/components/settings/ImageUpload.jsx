@@ -37,8 +37,6 @@ export default function ImageUpload({ currentImage, onUpload, folder = 'business
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `${folder}/${fileName}`;
 
-      console.log('Attempting upload to bucket:', 'avatars', 'path:', filePath);
-
       // Upload to Supabase Storage
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
@@ -47,23 +45,18 @@ export default function ImageUpload({ currentImage, onUpload, folder = 'business
           upsert: false
         });
 
-      if (uploadError) {
-        console.error('Supabase upload error:', uploadError);
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
-      console.log('Upload successful. Public URL:', publicUrl);
-
       onUpload(publicUrl);
       toast.success('Image uploaded successfully');
     } catch (error) {
-      console.error('Full upload catch error:', error);
-      toast.error(`Upload failed: ${error.message || 'Unknown error'}`);
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image. Please try again.');
       setPreview(currentImage);
     } finally {
       setUploading(false);
