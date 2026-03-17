@@ -76,7 +76,7 @@ export default function ChatInterface({ business, userName }) {
               status: 'read'
             })));
           } else {
-            const welcome = `Welcome to ${business.name}! I'm your AI concierge. I can help you with bookings, product inquiries, or general support in any language. How can I assist you today?`;
+            const welcome = `Welcome to ${business.name}! I'm VOXY AI. I can help you with bookings, product inquiries, or general support in any language. How can I assist you today?`;
             setMessages([{
               id: 'welcome',
               role: 'ai',
@@ -288,7 +288,7 @@ export default function ChatInterface({ business, userName }) {
           >
             <div className="relative">
               <div className="size-12 sm:size-16 rounded-xl sm:rounded-2xl bg-[#00D18F]/10 flex items-center justify-center border border-[#00D18F]/10 shadow-sm transition-transform duration-500 overflow-hidden">
-                <img src="/favicon.jpg" alt="Voxy AI" className="size-full object-cover" />
+                <img src={business?.logo_url || "/favicon.jpg"} alt={business?.name || "Voxy AI"} className="size-full object-cover" />
               </div>
               <div className="absolute -bottom-1 -right-1 p-0.5 sm:p-1 bg-black rounded-lg border border-white/5">
                 <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4 text-[#00D18F]" />
@@ -299,7 +299,6 @@ export default function ChatInterface({ business, userName }) {
                 <h2 className="font-display font-bold text-lg sm:text-2xl text-white group-hover:text-[#00D18F] transition-colors tracking-tight leading-tight truncate max-w-[120px] sm:max-w-none">
                   {business?.name || "Merchant"}
                 </h2>
-                <Badge className="bg-[#00D18F]/10 text-[#00D18F] border-none text-[7px] sm:text-[8px] py-0.5 sm:py-1 px-1.5 sm:px-2.5 font-black tracking-widest uppercase rounded-lg">Concierge</Badge>
               </div>
               <p className="text-[8px] sm:text-[10px] text-zinc-500 flex items-center gap-1.5 sm:gap-2 font-black uppercase tracking-widest mt-0.5 sm:mt-1 opacity-60">
                 <span className={`w-1.5 h-1.5 rounded-full ${isBusinessOnline ? 'bg-[#00D18F] shadow-[0_0_8px_#00D18F]' : 'bg-zinc-700'}`}></span>
@@ -330,6 +329,8 @@ export default function ChatInterface({ business, userName }) {
               }`}>
                 {msg.role === "ai" ? (
                   <img src="/favicon.jpg" alt="Voxy AI" className="size-full object-cover" />
+                ) : msg.role === "owner" ? (
+                  <img src={business?.logo_url || "/favicon.jpg"} alt={business?.name || "Merchant"} className="size-full object-cover" />
                 ) : (
                   <User className="size-3.5 sm:size-4" />
                 )}
@@ -360,6 +361,8 @@ export default function ChatInterface({ business, userName }) {
                <div className="size-8 sm:size-10 rounded-lg sm:rounded-xl bg-[#00D18F]/5 border border-[#00D18F]/20 text-[#00D18F] flex items-center justify-center shadow-2xl overflow-hidden">
                 {typingUser === 'ai' ? (
                   <img src="/favicon.jpg" alt="Voxy AI" className="size-full object-cover" />
+                ) : typingUser === 'owner' ? (
+                  <img src={business?.logo_url || "/favicon.jpg"} alt={business?.name || "Merchant"} className="size-full object-cover" />
                 ) : (
                   <User className="size-3.5 sm:size-4" />
                 )}

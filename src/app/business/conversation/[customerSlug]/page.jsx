@@ -206,7 +206,11 @@ export default function ConversationPage({ params }) {
           startTime={conversation?.created_at}
         />
         
-        <MessageList messages={messages} isTyping={isAiTyping} />
+        <MessageList 
+          messages={messages} 
+          isTyping={isAiTyping} 
+          typingAvatar={conversation?.customer_name?.charAt(0) || 'C'}
+        />
         
         <MessageInput 
           onSendMessage={handleSendMessage} 
