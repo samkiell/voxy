@@ -1,135 +1,107 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/hooks/useAuth';
 import ProfileCompletion from '@/components/settings/ProfileCompletion';
 import BusinessInfoForm from '@/components/settings/BusinessInfoForm';
 import BusinessHoursEditor from '@/components/settings/BusinessHoursEditor';
 import AssistantConfig from '@/components/settings/AssistantConfig';
-import { Loader2, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Save, Loader2, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function SettingsPage() {
-  const { user } = useAuth();
+const SETTINGS_FIELDS = [
+  'name',
+  'description',
+  'category',
+  'business_hours',
+  'assistant_tone'
+];
+
+export default function BusinessSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [business, setBusiness] = useState(null);
-  
-  const [formData, setFormData] = useState({});
-  const [hours, setHours] = useState({});
-  const [config, setConfig] = useState({});
-  const [completion, setCompletion] = useState(0);
+  const [businessData, setBusinessData] = useState({
+    name: '',
+    description: '',
+    category: '',
+    custom_category: '',
+    business_hours: {},
+    assistant_tone: '',
+    assistant_instructions: '',
+    profile_completion: 0,
+    is_live: false
+  });
+
+  const calculateCompletion = useCallback((data) => {
+    let completedCount = 0;
+    
+    if (data.name && data.name.trim().length > 0) completedCount++;
+    if (data.description && data.description.trim().length > 0) completedCount++;
+    if (data.category && data.category.trim().length > 0) completedCount++;
+    
+    // Check if business hours are set (at least one day not closed or custom logic)
+    // For simplicity, we check if business_hours object exists and has entries
+    if (data.business_hours && Object.keys(data.business_hours).length > 0) {
+      completedCount++;
+    }
+    
+    if (data.assistant_tone && data.assistant_tone.trim().length > 0) completedCount++;
+
+    const percentage = Math.round((completedCount / SETTINGS_FIELDS.length) * 100);
+    return percentage;
+  }, []);
+
+  const fetchBusinessData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/businesses');
+      const data = await res.json();
+      
+      if (data.success && data.business) {
+        setBusinessData(data.business);
+      }
+    } catch (error) {
+      console.error('Error fetching business data:', error);
+      toast.error('Failed to load settings');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!user) return;
+    fetchBusinessData();
+  }, []);
 
-    const fetchBusiness = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch('/api/businesses');
-        const data = await res.json();
-        
-        if (data.success && data.business) {
-          const biz = data.business;
-          setBusiness(biz);
-          setFormData({
-            name: biz.name,
-            description: biz.description,
-            category: biz.category,
-            custom_category: biz.custom_category
-          });
-          setHours(biz.business_hours || {});
-          setConfig({
-            assistant_tone: biz.assistant_tone,
-            assistant_instructions: biz.assistant_instructions
-          });
-          setCompletion(biz.profile_completion || 0);
-        }
-      } catch (err) {
-        console.error('Fetch error:', err);
-        toast.error('Failed to load settings');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBusiness();
-  }, [user]);
-
-  const calculateCompletion = (data, hrs, cfg) => {
-    const fields = [
-      !!data.name,
-      !!data.description,
-      !!(data.category && (data.category !== 'Other' || data.custom_category)),
-      Object.keys(hrs).length > 0 && Object.values(hrs).some(h => h.closed || (h.open && h.close)),
-      !!cfg.assistant_tone
-    ];
-    
-    const completedCount = fields.filter(Boolean).length;
-    return Math.round((completedCount / fields.length) * 100);
+  const handleDataChange = (newData) => {
+    const completion = calculateCompletion(newData);
+    setBusinessData({
+      ...newData,
+      profile_completion: completion,
+      is_live: completion >= 80
+    });
   };
 
   const handleSave = async () => {
-    if (!user) return;
-    
+    setSaving(true);
     try {
-      setSaving(true);
-      const newCompletion = calculateCompletion(formData, hours, config);
-      const isLive = newCompletion >= 80;
-
-      const payload = {
-        name: formData.name,
-        description: formData.description,
-        category: formData.category,
-        custom_category: formData.custom_category,
-        assistant_tone: config.assistant_tone,
-        assistant_instructions: config.assistant_instructions,
-        business_hours: hours,
-        profile_completion: newCompletion,
-        is_live: isLive
-      };
-
-      const { data: existing, error: fetchError } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('owner_id', user.id)
-        .single();
-        
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
-      }
-
-      let resultData;
-
-      if (existing) {
-        const { data: updatedBusiness, error: updateError } = await supabase
-          .from('businesses')
-          .update(payload)
-          .eq('owner_id', user.id)
-          .select()
-          .single();
-
-        if (updateError) throw updateError;
-        resultData = updatedBusiness;
-      } else {
-        const { data: newBusiness, error: insertError } = await supabase
-          .from('businesses')
-          .insert([{ ...payload, owner_id: user.id }])
-          .select()
-          .single();
-
-        if (insertError) throw insertError;
-        resultData = newBusiness;
-      }
+      const res = await fetch('/api/businesses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(businessData)
+      });
       
-      setBusiness(resultData);
-      setCompletion(newCompletion);
-      toast.success('Settings synchronized successfully!');
-    } catch (err) {
-      console.error('Save error:', err);
-      toast.error(err.message || 'Failed to sync settings');
+      const data = await res.json();
+      
+      if (data.success) {
+        toast.success('Settings saved successfully!');
+        setBusinessData(data.business);
+      } else {
+        throw new Error(data.error || 'Failed to save');
+      }
+    } catch (error) {
+      console.error('Error saving business data:', error);
+      toast.error(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -137,48 +109,85 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <DashboardLayout title="Settings">
-        <div className="flex flex-col items-center justify-center h-[70vh] space-y-6">
-          <div className="relative">
-            <Loader2 className="w-12 h-12 animate-spin text-[#00D18F]" />
-            <div className="absolute inset-0 blur-xl bg-[#00D18F]/20 animate-pulse" />
-          </div>
-          <p className="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px]">Accessing Secure Config</p>
+      <DashboardLayout title="Business Settings">
+        <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-[#00D18F]" />
+          <p className="text-zinc-500 animate-pulse">Loading your business profile...</p>
         </div>
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout title="Settings">
-      <div className="max-w-5xl mx-auto space-y-12 pb-32">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <DashboardLayout title="Business Settings">
+      <div className="max-w-4xl mx-auto pb-20 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
           <div>
-            <p className="text-zinc-500 text-sm font-medium">Configure your business profile and AI assistant behavior.</p>
+            <h1 className="text-3xl font-bold text-white">Settings</h1>
+            <p className="text-zinc-500 mt-1">Configure your business profile and AI assistant</p>
           </div>
-          
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="group flex items-center gap-3 bg-[#00D18F] text-black px-8 py-4 rounded-xl font-bold hover:bg-emerald-400 active:scale-95 transition-all duration-300 disabled:opacity-50"
+          <Button 
+            onClick={fetchBusinessData} 
+            variant="outline" 
+            size="icon" 
+            className="rounded-full border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
           >
-            {saving ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Zap size={18} className="fill-current" />
-            )}
-            <span className="text-xs uppercase tracking-wider">{saving ? 'Saving...' : 'Save Settings'}</span>
-          </button>
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
 
-        <ProfileCompletion completion={completion} />
+        {/* Profile Completion */}
+        <ProfileCompletion completionPercentage={businessData.profile_completion} />
 
-        <div className="grid grid-cols-1 gap-12">
-          <BusinessInfoForm formData={formData} setFormData={setFormData} />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <BusinessHoursEditor hours={hours} setHours={setHours} />
-            <AssistantConfig config={config} setConfig={setConfig} />
+        <div className="grid grid-cols-1 gap-8">
+          {/* Business Info */}
+          <BusinessInfoForm 
+            data={businessData} 
+            onChange={handleDataChange} 
+          />
+
+          {/* Business Hours */}
+          <BusinessHoursEditor 
+            hours={businessData.business_hours} 
+            onChange={(hours) => handleDataChange({ ...businessData, business_hours: hours })} 
+          />
+
+          {/* Assistant Config */}
+          <AssistantConfig 
+            data={businessData} 
+            onChange={handleDataChange} 
+          />
+        </div>
+
+        {/* Action Bar */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 md:left-64 bg-black/60 backdrop-blur-md border-t border-zinc-800 z-50">
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+            <div className="hidden sm:block">
+              <p className="text-xs text-zinc-500">
+                {businessData.is_live 
+                  ? "Your business is currently LIVE and visible to customers." 
+                  : "Complete your profile to go live."}
+              </p>
+            </div>
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="w-full sm:w-auto bg-[#00D18F] hover:bg-[#00b37a] text-black font-semibold px-8 py-6 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-[#00D18F]/20"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Save Changes
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>

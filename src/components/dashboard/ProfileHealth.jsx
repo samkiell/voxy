@@ -1,5 +1,4 @@
-import React from 'react';
-import { Check, X, ArrowRight } from 'lucide-react';
+import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const ProfileHealth = ({ business }) => {
@@ -14,9 +13,9 @@ const ProfileHealth = ({ business }) => {
   const completionPercentage = Math.round((completedFields / fields.length) * 100);
 
   return (
-    <div className="bg-[#111111] border border-white/5 p-8 rounded-2xl sticky top-6 overflow-hidden group">
-      <div className="flex items-center gap-4 mb-8">
-        <h2 className="text-xl font-display font-bold text-white tracking-tight">Profile Health</h2>
+    <div className="bg-[#111111] border border-white/5 p-6 sm:p-8 rounded-2xl sticky top-6 overflow-hidden group">
+      <div className="flex items-center gap-4 mb-6 sm:mb-8">
+        <h2 className="text-lg sm:text-xl font-display font-bold text-white tracking-tight">Profile Health</h2>
       </div>
       
       <div className="space-y-4 mb-8">
@@ -24,12 +23,12 @@ const ProfileHealth = ({ business }) => {
           <div key={field.key} className="flex items-center justify-between py-2 border-b border-white/[0.03] last:border-0">
             <span className="text-zinc-400 text-sm font-medium">{field.label}</span>
             {business?.[field.key] ? (
-              <div className="bg-emerald-500/10 p-1 rounded-full text-emerald-500">
-                <Check size={12} strokeWidth={3} />
+              <div className="text-voxy-primary">
+                <CheckCircle2 size={16} />
               </div>
             ) : (
-              <div className="bg-red-500/10 p-1 rounded-full text-red-500">
-                <X size={12} strokeWidth={3} />
+              <div className="text-red-500">
+                <XCircle size={16} />
               </div>
             )}
           </div>
