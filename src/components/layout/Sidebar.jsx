@@ -109,19 +109,22 @@ export default function Sidebar({ isOpen, onClose }) {
           </button>
 
           {/* User Profile */}
-          <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-[#0a0a0a] border border-white/5 mt-2">
+          <Link 
+            href={role === 'business_owner' ? '/business/profile' : (role === 'customer' ? '/customer/settings' : pathname)}
+            className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-[#0a0a0a] border border-white/5 mt-2 hover:border-[#00D18F]/30 transition-all group/profile"
+          >
             <div className="size-10 rounded-full bg-[#00D18F] flex items-center justify-center text-black font-bold text-sm">
               {userDisplayName.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="font-bold text-sm text-white truncate leading-none tracking-tight">
+              <div className="font-bold text-sm text-white truncate leading-none tracking-tight group-hover/profile:text-[#00D18F] transition-colors">
                 {userDisplayName}
               </div>
               <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mt-1">
                 {roleLabel}
               </div>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </>
