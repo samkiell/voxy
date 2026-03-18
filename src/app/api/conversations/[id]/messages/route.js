@@ -4,47 +4,12 @@ import { getUserFromCookie } from '@/lib/auth';
 
 export async function GET(req, { params }) {
   try {
-    const user = await getUserFromCookie();
-    if (!user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id } = await params;
 
-    const convRes = await db.query(
-      `SELECT c.*, b.owner_id 
-       FROM conversations c 
-       JOIN businesses b ON c.business_id = b.id 
-       WHERE c.id = $1`,
+    const result = await db.query(
+      'SELECT * FROM messages WHERE conversation_id = $1 ORDER BY created_at ASC',
       [id]
     );
-
-    if (convRes.rowCount === 0) {
-      return NextResponse.json({ success: true, messages: [] });
-    }
-
-    const conv = convRes.rows[0];
-    const isCustomer = user.id === conv.customer_id;
-    const isOwner = user.id === conv.owner_id;
-
-    let clearedAt = null;
-    if (isCustomer) {
-      clearedAt = conv.customer_cleared_at;
-    } else if (isOwner) {
-      clearedAt = conv.business_cleared_at;
-    }
-
-    let query = 'SELECT * FROM messages WHERE conversation_id = $1';
-    let queryParams = [id];
-
-    if (clearedAt) {
-      query += ' AND created_at > $2';
-      queryParams.push(clearedAt);
-    }
-
-    query += ' ORDER BY created_at ASC';
-
-    const result = await db.query(query, queryParams);
 
     return NextResponse.json({ success: true, messages: result.rows });
   } catch (error) {

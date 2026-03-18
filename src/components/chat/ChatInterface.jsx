@@ -275,43 +275,6 @@ export default function ChatInterface({ business, userName }) {
     setInputValue(text);
   };
 
-  const [showMenu, setShowMenu] = useState(false);
-  const [useAi, setUseAi] = useState(business?.use_ai_reply !== false);
-
-  const toggleAi = async () => {
-    try {
-      const newVal = !useAi;
-      setUseAi(newVal);
-      await fetch('/api/businesses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          ...business,
-          use_ai_reply: newVal 
-        })
-      });
-    } catch (err) {
-      console.error('Toggle AI error:', err);
-    }
-  };
-
-  const handleClearChat = async () => {
-    if (!conversationId) return;
-    if (!confirm("Are you sure you want to clear your chat history? This only clears it for you.")) return;
-    
-    try {
-      const res = await fetch(`/api/conversations/${conversationId}/clear`, {
-        method: 'POST'
-      });
-      if (res.ok) {
-        setMessages([]);
-        setShowMenu(false);
-      }
-    } catch (err) {
-      console.error('Clear chat error:', err);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-6 bg-black rounded-[3rem] border border-white/5">
@@ -367,36 +330,8 @@ export default function ChatInterface({ business, userName }) {
         </div>
 
         <div className="flex items-center gap-1 sm:gap-3 relative z-10">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleAi}
-            className={`rounded-xl sm:rounded-2xl hover:bg-white/5 h-10 w-10 sm:h-12 sm:w-12 transition-colors ${useAi ? 'text-[#00D18F]' : 'text-zinc-500'}`}
-          >
-            <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
-          </Button>
-          
-          <div className="relative">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setShowMenu(!showMenu)}
-              className="rounded-xl sm:rounded-2xl hover:bg-white/5 text-zinc-500 h-10 w-10 sm:h-12 sm:w-12"
-            >
-              <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
-            
-            {showMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-                <button 
-                  onClick={handleClearChat}
-                  className="w-full px-4 py-4 text-left text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-white/5 transition-colors"
-                >
-                  Clear Chat
-                </button>
-              </div>
-            )}
-          </div>
+          <Button variant="ghost" size="icon" className="rounded-xl sm:rounded-2xl hover:bg-white/5 text-zinc-500 h-9 w-9 sm:h-11 sm:w-11"><Volume2 className="w-4 h-4 sm:w-5 sm:h-5" /></Button>
+          <Button variant="ghost" size="icon" className="rounded-xl sm:rounded-2xl hover:bg-white/5 text-zinc-500 h-9 w-9 sm:h-11 sm:w-11"><MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" /></Button>
         </div>
       </div>
 
@@ -407,8 +342,7 @@ export default function ChatInterface({ business, userName }) {
             key={msg.id || idx}
             className={`flex ${msg.role === "customer" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-4 duration-700`}
           >
-            <div className={`flex gap-3 sm:gap-4 max-w-[90%] sm:max-w-[70%] ${msg.role === "customer" ? "flex-row-reverse" : "flex-row"}`}>
-              {/* Avatar */}
+            <div className={`flex gap-3 sm:gap-5 max-w-[90%] sm:max-w-[75%] ${msg.role === "customer" ? "flex-row-reverse" : "flex-row"}`}>
               <div className={`size-8 sm:size-10 rounded-lg sm:rounded-xl flex-shrink-0 flex items-center justify-center border shadow-xl overflow-hidden ${
                 msg.role === "ai"
                   ? "bg-[#00D18F]/5 border-[#00D18F]/20 text-[#00D18F]"
@@ -421,41 +355,31 @@ export default function ChatInterface({ business, userName }) {
                 ) : msg.role === "owner" ? (
                   <img src={business?.logo_url || "/favicon.jpg"} alt={business?.name || "Merchant"} className="size-full object-cover" />
                 ) : (
-                  <div className="size-full bg-white/5 flex items-center justify-center">
-                    <User className="size-3.5 sm:size-4 text-zinc-500" />
-                  </div>
+                  <User className="size-3.5 sm:size-4" />
                 )}
               </div>
 
-              {/* Message Content */}
-              <div className={`flex flex-col space-y-1.5 ${msg.role === "customer" ? "items-end" : "items-start"}`}>
-                {/* Sender Label */}
-                <div className={`flex items-center gap-3 px-1 ${msg.role === "customer" ? "flex-row-reverse" : ""}`}>
-                  <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] ${
+              <div className={`flex flex-col space-y-1 ${msg.role === "customer" ? "items-end" : "items-start"}`}>
+                <div className={`flex items-center gap-3 px-1 mb-0.5 ${msg.role === "customer" ? "flex-row-reverse" : ""}`}>
+                  <span className={`text-[10px] font-black uppercase tracking-wider ${
                     msg.role === "owner" ? "text-blue-400" : msg.role === "ai" ? "text-[#00D18F]" : "text-zinc-500"
                   }`}>
-                    {msg.role === 'customer' ? (userName || 'Customer') : msg.role === 'owner' ? business?.name || 'Owner' : 'VOXY AI'}
+                    {msg.role === 'customer' ? (userName || 'You') : msg.role === 'owner' ? business?.name || 'Owner' : 'VOXY AI'}
                   </span>
                 </div>
-
-                {/* Bubble */}
-                <div className={`px-4 sm:px-6 py-3 sm:py-4 rounded-2xl sm:rounded-[2.2rem] text-[14px] sm:text-[15px] leading-relaxed transition-all duration-500 ${
+                <div className={`px-4 sm:px-6 py-3 sm:py-4 rounded-2xl sm:rounded-[2rem] text-[14px] sm:text-[15px] leading-relaxed shadow-2xl transition-all duration-700 hover:scale-[1.01] ${
                   msg.role === "customer"
-                    ? "bg-[#00D18F] text-black font-bold rounded-tr-[0.2rem] sm:rounded-tr-[0.4rem]"
+                    ? "bg-[#00D18F] text-black font-bold rounded-tr-[0.4rem] sm:rounded-tr-[0.5rem] shadow-sm"
                     : msg.role === "owner"
-                      ? "bg-white/[0.03] text-white border border-white/5 rounded-tl-[0.2rem] sm:rounded-tl-[0.4rem]"
-                      : "bg-white/[0.03] text-zinc-100 border border-white/5 rounded-tl-[0.2rem] sm:rounded-tl-[0.4rem]"
+                      ? "bg-blue-500/10 text-white border border-blue-500/30 rounded-tl-[0.4rem] sm:rounded-tl-[0.5rem]"
+                      : "bg-white/[0.03] text-zinc-100 border border-white/[0.05] rounded-tl-[0.4rem] sm:rounded-tl-[0.5rem]"
                 }`}>
                   {msg.content}
                 </div>
-
-                {/* Status/Time */}
                 <div className={`flex items-center gap-2 px-1 ${msg.role === "customer" ? "flex-row-reverse" : ""}`}>
-                  <span className="text-[8px] sm:text-[9px] font-black text-zinc-700 uppercase tracking-widest leading-none">{msg.timestamp}</span>
+                  <span className="text-[8px] sm:text-[9px] font-black text-zinc-600 uppercase tracking-widest leading-none">{msg.timestamp}</span>
                   {msg.role === "customer" && (
-                    <div className="flex -space-x-1">
-                      <CheckCheck size={10} className={msg.status === "read" ? "text-[#00D18F]" : "text-zinc-800"} />
-                    </div>
+                    <CheckCheck size={10} className={msg.status === "read" ? "text-[#00D18F]" : "text-zinc-700"} />
                   )}
                 </div>
               </div>

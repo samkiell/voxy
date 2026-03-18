@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble';
 
-const MessageList = ({ messages, isTyping, typingAvatar, customerName }) => {
+const MessageList = ({ messages, isTyping, typingAvatar }) => {
   const scrollRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -23,7 +23,6 @@ const MessageList = ({ messages, isTyping, typingAvatar, customerName }) => {
               key={msg.id || index} 
               message={msg} 
               senderType={msg.sender_type} 
-              customerName={customerName}
             />
           ))
         ) : (

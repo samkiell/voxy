@@ -30,9 +30,9 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
  * An expanded, educational onboarding guide that teaches the user
  * how Voxy works while setting up their business.
  */
-export default function OnboardingModal({ onComplete, forced = false }) {
+export default function OnboardingModal({ onComplete }) {
   const { user } = useAuth();
-  const [isOpen, setIsOpen] = useState(forced);
+  const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [isFinishing, setIsFinishing] = useState(false);
   const [setupLogs, setSetupLogs] = useState([]);
@@ -52,19 +52,13 @@ export default function OnboardingModal({ onComplete, forced = false }) {
   });
 
   useEffect(() => {
-    if (!forced) {
-      const timer = setTimeout(() => setIsOpen(true), 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [forced]);
+    const timer = setTimeout(() => setIsOpen(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const handleClose = () => {
-    if (forced) return;
-    setIsOpen(false);
-  };
+  const handleClose = () => setIsOpen(false);
 
   const handleSkip = () => {
-    if (forced) return;
     setIsOpen(false);
     router.push('/business/settings');
   };
@@ -234,11 +228,9 @@ export default function OnboardingModal({ onComplete, forced = false }) {
                       <Button onClick={() => setStep(2)} className="w-full h-12 text-[15px] font-semibold bg-[#00D18F] text-black hover:bg-[#00D18F]/90 rounded-xl transition-all tracking-tight">
                         Start guided setup <ArrowRight size={16} className="ml-2" />
                       </Button>
-                      {!forced && (
-                        <button onClick={handleSkip} className="w-full py-2 text-[11px] font-medium text-zinc-700 hover:text-white transition-colors mt-2">
-                          Skip and explore alone
-                        </button>
-                      )}
+                      <button onClick={handleSkip} className="w-full py-2 text-[11px] font-medium text-zinc-700 hover:text-white transition-colors mt-2">
+                        Skip and explore alone
+                      </button>
                     </div>
                   </motion.div>
                 )}

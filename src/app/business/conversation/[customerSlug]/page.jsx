@@ -142,42 +142,6 @@ export default function ConversationPage({ params }) {
     });
   };
 
-  const handleToggleAi = async () => {
-    if (!conversation?.business_id) return;
-    try {
-      const newVal = !conversation.use_ai_reply;
-      // Optimistic update
-      setConversation(prev => ({ ...prev, use_ai_reply: newVal }));
-      
-      await fetch('/api/businesses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          id: conversation.business_id,
-          use_ai_reply: newVal 
-        })
-      });
-    } catch (err) {
-      console.error('Toggle AI error:', err);
-    }
-  };
-
-  const handleClearChat = async () => {
-    if (!conversation?.id) return;
-    if (!confirm("Are you sure you want to clear this chat history? This only clears it for you.")) return;
-    
-    try {
-      const res = await fetch(`/api/conversations/${conversation.id}/clear`, {
-        method: 'POST'
-      });
-      if (res.ok) {
-        setMessages([]);
-      }
-    } catch (err) {
-      console.error('Clear chat error:', err);
-    }
-  };
-
   const handleSendMessage = async (content) => {
     if (!user || !conversation?.id || !content.trim()) return;
     
@@ -198,11 +162,7 @@ export default function ConversationPage({ params }) {
       const res = await fetch(`/api/conversations/${conversation.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          content, 
-          senderType: 'owner',
-          setStatus: 'Active' // Business replying makes it active
-        })
+        body: JSON.stringify({ content, senderType: 'owner' })
       });
       
       const data = await res.json();
@@ -244,17 +204,12 @@ export default function ConversationPage({ params }) {
           customerName={conversation?.customer_name}
           status={isCustomerOnline ? 'Active Now' : (conversation?.status || 'Offline')}
           startTime={conversation?.created_at}
-          businessLogo={user?.business?.logo_url}
-          useAi={conversation?.use_ai_reply !== false}
-          onToggleAi={handleToggleAi}
-          onClearChat={handleClearChat}
         />
         
         <MessageList 
           messages={messages} 
-          isTyping={isAiTyping}
+          isTyping={isAiTyping} 
           typingAvatar={conversation?.customer_name?.charAt(0) || 'C'}
-          customerName={conversation?.customer_name}
         />
         
         <MessageInput 

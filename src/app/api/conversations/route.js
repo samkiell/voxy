@@ -98,7 +98,7 @@ export async function GET(req) {
       }
     } else {
       let query = `
-        SELECT c.*, b.name as business_name, b.slug as business_slug, b.use_ai_reply,
+        SELECT c.*, b.name as business_name, b.slug as business_slug,
                u.name as actual_customer_name, u.slug as customer_slug,
                lm.content AS last_message,
                lm.created_at AS last_message_at,
