@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Play, Volume2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import ChatHeader from "@/components/conversation/ChatHeader";
 import MessageList from "@/components/conversation/MessageList";
@@ -17,6 +17,8 @@ export default function ChatInterface({ business, userName }) {
   const [isAiEnabled, setIsAiEnabled] = useState(true);
   const [isAiAllowed, setIsAiAllowed] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState(null); // 'recording' | 'processing' | 'speaking' | null
+  const [pendingAudioUrl, setPendingAudioUrl] = useState(null);
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -259,6 +261,7 @@ export default function ChatInterface({ business, userName }) {
     if (!conversationId || isSending) return;
     
     setIsSending(true);
+    setVoiceStatus('processing');
     handleTyping(false);
 
     try {
@@ -279,18 +282,69 @@ export default function ChatInterface({ business, userName }) {
           audioRef.current.currentTime = 0;
         }
         
-        // Play the new audio response
+        // Play the new audio response (mobile-safe)
         const audio = new Audio(data.audioUrl);
         audioRef.current = audio;
-        audio.play().catch(e => console.error("Audio play error:", e));
+        
+        audio.addEventListener('ended', () => {
+          setVoiceStatus(null);
+          setPendingAudioUrl(null);
+        });
+        audio.addEventListener('error', () => {
+          setVoiceStatus(null);
+          setPendingAudioUrl(null);
+        });
+
+        try {
+          await audio.play();
+          setVoiceStatus('speaking');
+          setPendingAudioUrl(null);
+        } catch (e) {
+          // Autoplay blocked (mobile) — show fallback play button
+          console.warn('Autoplay blocked, showing fallback button:', e);
+          setPendingAudioUrl(data.audioUrl);
+          setVoiceStatus(null);
+        }
       } else if (!data.success) {
          console.error("Voice API error:", data.error || data.message);
+         setVoiceStatus(null);
       }
     } catch (err) {
       console.error('Voice send error:', err);
+      setVoiceStatus(null);
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handlePlayPendingAudio = () => {
+    if (!pendingAudioUrl) return;
+    const audio = new Audio(pendingAudioUrl);
+    audioRef.current = audio;
+    audio.addEventListener('ended', () => {
+      setVoiceStatus(null);
+      setPendingAudioUrl(null);
+    });
+    audio.play().then(() => {
+      setVoiceStatus('speaking');
+    }).catch(e => {
+      console.error('Fallback play failed:', e);
+      setVoiceStatus(null);
+      setPendingAudioUrl(null);
+    });
+  };
+
+  const handleFileUpload = async (file) => {
+    if (!conversationId) return;
+    // Placeholder for future file handling — send as message for now
+    const tempId = 'temp-' + Date.now();
+    setMessages(prev => [...prev, {
+      id: tempId,
+      role: 'customer',
+      content: `📎 Sent file: ${file.name}`,
+      created_at: new Date().toISOString(),
+      status: 'read'
+    }]);
   };
 
   if (loading) {
@@ -331,13 +385,27 @@ export default function ChatInterface({ business, userName }) {
           conversationId={conversationId}
         />
 
+        {/* Fallback Play Button for mobile autoplay block */}
+        {pendingAudioUrl && (
+          <div className="flex justify-center py-2 px-4 animate-in fade-in duration-300">
+            <button
+              onClick={handlePlayPendingAudio}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#00D18F]/10 border border-[#00D18F]/20 text-[#00D18F] text-xs font-bold uppercase tracking-widest hover:bg-[#00D18F]/20 transition-all active:scale-95 shadow-lg"
+            >
+              <Play className="size-4 fill-current" />
+              Play AI Response
+            </button>
+          </div>
+        )}
       </div>
 
       <MessageInput 
         onSendMessage={handleSendMessage}
         onAudioReady={handleAudioReady}
         onTyping={handleTyping}
+        onFileUpload={handleFileUpload}
         isLoading={isSending}
+        voiceStatus={voiceStatus}
         placeholder={`Engage with ${business?.name || "Assistant"}...`}
       />
     </div>

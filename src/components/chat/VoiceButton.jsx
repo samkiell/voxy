@@ -14,13 +14,13 @@ export const VoiceButton = ({ onAudioReady, isLoading }) => {
     }
   };
 
-  const { state, error, startRecording, stopRecording, isRecording, isProcessing } = useVoiceRecorder({ 
+  const { state, error, startRecording, stopRecording, isRecording } = useVoiceRecorder({ 
     onAutoStop: (blob) => {
       if (blob) onAudioReady(blob);
     }
   });
 
-  const busy = isLoading || isProcessing;
+  const busy = isLoading;
 
   return (
     <div className="relative group flex items-center justify-center">

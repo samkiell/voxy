@@ -16,7 +16,7 @@ const MessageList = ({ messages, isTyping, typingAvatar, businessName, onTypeCom
   }, [messages, isTyping, typingUser]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-10 bg-[#000000] scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+    <div className="flex-1 overflow-y-auto px-3 py-4 md:px-10 md:py-8 bg-[#000000] scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
       <div className="max-w-5xl mx-auto space-y-6 sm:space-y-10">
         {messages && messages.length > 0 ? (
           messages.map((msg, index) => (

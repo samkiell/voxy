@@ -39,7 +39,7 @@ export const useVoiceRecorder = (options = {}) => {
           streamRef.current = null;
         }
         
-        setState('processing');
+        setState('idle');
         resolve(audioBlob);
       };
 

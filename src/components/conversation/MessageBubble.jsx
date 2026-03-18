@@ -45,7 +45,7 @@ const MessageBubble = ({ message, senderType, businessName, onTypeComplete, conv
 
   return (
     <div
-      className={`flex flex-col mb-8 group ${isMe ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-4 duration-700`}
+      className={`flex flex-col mb-1 group ${isMe ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-4 duration-700`}
       onMouseDown={handleLongPressStart}
       onMouseUp={handleLongPressEnd}
       onMouseLeave={handleLongPressEnd}
