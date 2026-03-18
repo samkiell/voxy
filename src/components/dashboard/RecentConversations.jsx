@@ -54,7 +54,7 @@ const RecentConversations = ({ conversations }) => {
                     {getStatusBadge(conv.status)}
                   </div>
                   <p className="text-zinc-600 text-sm truncate max-w-[200px] sm:max-w-md mt-0.5 font-medium leading-relaxed">
-                    {conv.last_message || 'No messages yet'}
+                    {conv.last_message?.startsWith('[img]') ? '📷 Photo' : (conv.last_message || 'No messages yet')}
                   </p>
                 </div>
               </div>

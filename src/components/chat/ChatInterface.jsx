@@ -103,18 +103,13 @@ export default function ChatInterface({ business, userName }) {
           
           const tempMatch = prev.find(m => 
             m.id?.toString().startsWith('temp-') && 
-            m.content === msg.content && 
-            m.role === msg.sender_type
+            m.sender_type === payload.new.sender_type &&
+            (m.content === payload.new.content || 
+             (m.content.startsWith('[img]') && payload.new.content.startsWith('[img]')))
           );
 
           if (tempMatch) {
-            return prev.map(m => m.id === tempMatch.id ? {
-              id: msg.id,
-              role: msg.sender_type,
-              content: msg.content,
-              created_at: msg.created_at,
-              status: 'read'
-            } : m);
+            return prev.map(m => m.id === tempMatch.id ? payload.new : m);
           }
 
           return [...prev, {

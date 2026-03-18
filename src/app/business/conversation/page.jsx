@@ -23,13 +23,13 @@ function ConversationsPageContent() {
         const res = await fetch('/api/conversations');
         const data = await res.json();
         if (data.success) {
-          setConversations(data.conversations.map(c => ({
-            ...c,
-            name: c.customer_name || 'Guest',
-            snippet: c.last_message || 'No messages yet',
-            time: c.last_message_at 
-              ? new Date(c.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              : new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            setConversations(data.conversations.map(c => ({
+              ...c,
+              name: c.customer_name || 'Guest',
+              snippet: c.last_message?.startsWith('[img]') ? '📷 Photo' : (c.last_message || 'No messages yet'),
+              time: c.last_message_at 
+                ? new Date(c.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             language: 'English',
             sentiment: c.sentiment || 'Neutral'
           })));
