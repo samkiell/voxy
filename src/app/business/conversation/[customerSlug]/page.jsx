@@ -244,6 +244,7 @@ export default function ConversationPage({ params }) {
           customerName={conversation?.customer_name}
           status={isCustomerOnline ? 'Active Now' : (conversation?.status || 'Offline')}
           startTime={conversation?.created_at}
+          businessLogo={user?.business?.logo_url}
           useAi={conversation?.use_ai_reply !== false}
           onToggleAi={handleToggleAi}
           onClearChat={handleClearChat}
@@ -251,8 +252,9 @@ export default function ConversationPage({ params }) {
         
         <MessageList 
           messages={messages} 
-          isTyping={isAiTyping} 
+          isTyping={isAiTyping}
           typingAvatar={conversation?.customer_name?.charAt(0) || 'C'}
+          customerName={conversation?.customer_name}
         />
         
         <MessageInput 
