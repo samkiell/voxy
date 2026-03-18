@@ -71,10 +71,14 @@ export default function CustomerChatHistoryPage() {
                 >
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
                     <div className="relative flex-shrink-0">
-                      <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-[1.25rem] sm:rounded-[1.75rem] overflow-hidden ring-4 sm:ring-8 ring-zinc-50 dark:ring-white/5 shadow-inner group-hover:scale-105 transition-all duration-700 bg-[#00D18F]/10 flex items-center justify-center`}>
+                      <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-[1.25rem] sm:rounded-[1.75rem] overflow-hidden ring-4 sm:ring-8 ring-zinc-50 dark:ring-white/5 shadow-inner group-hover:scale-105 transition-all duration-700 bg-[#00D18F]/10 flex items-center justify-center relative`}>
                         <MessageSquare className="w-8 h-8 sm:w-10 sm:h-10 text-[#00D18F]" />
+                        {chat.unread_count > 0 && (
+                          <div className="absolute -top-1 -right-1 size-6 sm:size-8 bg-[#00D18F] text-black text-[12px] sm:text-[14px] font-black rounded-full flex items-center justify-center border-4 border-white dark:border-[#18181b] shadow-xl animate-pulse">
+                            {chat.unread_count}
+                          </div>
+                        )}
                       </div>
-                      <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-[#00D18F] rounded-full border-[3px] sm:border-4 border-white dark:border-[#18181b] shadow-lg"></div>
                     </div>
                     
                     <div className="flex-1 min-w-0 space-y-2 w-full">

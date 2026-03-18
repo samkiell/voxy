@@ -6,7 +6,12 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Search, Filter, Languages, Volume2, ChevronRight, MessageSquare, Bot } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
+import { useSearchParams } from 'next/navigation';
+
 export default function ConversationsPage() {
+  const searchParams = useSearchParams();
+  const statusFilter = searchParams.get('status');
+  
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +31,7 @@ export default function ConversationsPage() {
               ? new Date(c.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               : new Date(c.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             language: 'English',
-            sentiment: 'Neutral'
+            sentiment: c.sentiment || 'Neutral'
           })));
         }
       } catch (err) {
@@ -39,10 +44,16 @@ export default function ConversationsPage() {
     fetchConversations();
   }, []);
 
-  const filteredConversations = conversations.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    c.snippet.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredConversations = conversations.filter(c => {
+    const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         c.snippet.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (statusFilter) {
+      return matchesSearch && c.status === statusFilter;
+    }
+    
+    return matchesSearch;
+  });
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -76,6 +87,17 @@ export default function ConversationsPage() {
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-voxy-text tracking-tight">Conversations</h1>
             <p className="text-sm text-voxy-muted">Manage and monitor customer interactions across all channels.</p>
+            {statusFilter && (
+              <div className="pt-2 flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#00D18F]">Active Filter:</span>
+                <div className="flex items-center gap-2 bg-[#00D18F]/10 border border-[#00D18F]/20 px-3 py-1 rounded-full">
+                  <span className="text-[10px] font-bold text-[#00D18F] uppercase tracking-wide">{statusFilter}</span>
+                  <Link href="/business/conversation" className="hover:text-white transition-colors">
+                    <Bot className="size-3 rotate-45" /> {/* Using Bot icon as a placeholder for an X or similar, but maybe just a Link is enough */}
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-3 w-full md:w-auto">
@@ -109,8 +131,13 @@ export default function ConversationsPage() {
                   <div className="flex items-center gap-5 min-w-0 flex-1">
                     {/* Avatar */}
                     <div className="relative flex-shrink-0">
-                      <div className="size-11 rounded-xl bg-voxy-primary/10 flex items-center justify-center text-voxy-primary font-bold text-lg border border-voxy-primary/10">
+                      <div className="size-11 rounded-xl bg-voxy-primary/10 flex items-center justify-center text-voxy-primary font-bold text-lg border border-voxy-primary/10 relative">
                         {conv.name.charAt(0)}
+                        {conv.unread_count > 0 && (
+                          <div className="absolute -top-1.5 -right-1.5 size-5 bg-[#00D18F] text-black text-[10px] font-black rounded-full flex items-center justify-center border-2 border-[#0A0A0A] shadow-lg animate-pulse">
+                            {conv.unread_count}
+                          </div>
+                        )}
                       </div>
                       <div className="absolute -bottom-1 -right-1 p-1 bg-[#0A0A0A] rounded-md border border-[#1A1A1A]">
                         <Volume2 className="w-2.5 h-2.5 text-voxy-primary" />

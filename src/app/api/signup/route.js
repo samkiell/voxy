@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { hashPassword, generateToken, setAuthCookie } from '@/lib/auth';
 import db from '@/lib/db';
 import { getUniqueSlug } from '@/lib/utils';
+import { sendVerificationEmail } from '@/lib/mailer';
+import { TOKEN_TYPES, generateRawToken, storeToken } from '@/lib/auth/tokens';
 
 export async function POST(req) {
   try {
@@ -30,18 +32,29 @@ export async function POST(req) {
     // 4. Generate unique slug
     const slug = await getUniqueSlug('users', name || email.split('@')[0], db);
 
-    // 5. Create user
+    // 5. Create user (unverified)
     const result = await db.query(
-      'INSERT INTO users (name, email, password_hash, role, slug) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role, slug',
-      [name, email, passwordHash, role, slug]
+      'INSERT INTO users (name, email, password_hash, role, slug, is_verified) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, role, slug',
+      [name, email.toLowerCase(), passwordHash, role, slug, false]
     );
 
     const newUser = result.rows[0];
 
+    // 6. Generate and Store Verification OTP
+    const rawOtp = generateRawToken(TOKEN_TYPES.EMAIL_VERIFICATION);
+    await storeToken(newUser.id, TOKEN_TYPES.EMAIL_VERIFICATION, rawOtp, 10);
+
+    // 7. Send Verification Email
+    try {
+      await sendVerificationEmail(newUser.email, newUser.name, rawOtp);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+    }
+
     return NextResponse.json(
-      { 
-        success: true, 
-        message: 'Registration successful',
+      {
+        success: true,
+        message: 'Account created! Please check your email for a verification code.',
         user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role }
       },
       { status: 201 }

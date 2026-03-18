@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
-import ConversationHeader from '@/components/conversation/ConversationHeader';
+import ChatHeader from '@/components/conversation/ChatHeader';
 import MessageList from '@/components/conversation/MessageList';
 import MessageInput from '@/components/conversation/MessageInput';
 import { Loader2 } from 'lucide-react';
@@ -77,10 +77,8 @@ export default function ConversationPage({ params }) {
         },
         (payload) => {
           setMessages((prev) => {
-            // If already exists, skip
             if (prev.find(m => m.id === payload.new.id)) return prev;
 
-            // Check if there's a temporary message that matches this one
             const tempMatch = prev.find(m => 
               m.id?.toString().startsWith('temp-') && 
               m.content === payload.new.content && 
@@ -88,18 +86,14 @@ export default function ConversationPage({ params }) {
             );
 
             if (tempMatch) {
-              // Replace it
               return prev.map(m => m.id === tempMatch.id ? payload.new : m);
             }
 
-            return [...prev, payload.new];
+            return [...prev, { ...payload.new, isNew: payload.new.sender_type !== 'owner' }];
           });
-          if (payload.new.sender_type === 'ai') setIsAiTyping(false);
+          if (payload.new.sender_type !== 'owner') setIsAiTyping(false);
         }
       )
-      .on('broadcast', { event: 'typing' }, (payload) => {
-        setIsAiTyping(payload.payload.isTyping);
-      })
       .on(
         'postgres_changes',
         {
@@ -132,6 +126,40 @@ export default function ConversationPage({ params }) {
       supabase.removeChannel(channel);
     };
   }, [conversation?.id]);
+
+  const handleTypeComplete = (id) => {
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, isNew: false } : m));
+  };
+
+  const handleToggleAi = async (checked) => {
+    if (!conversation?.id) return;
+    try {
+      const res = await fetch(`/api/conversations/${conversation.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ai_allowed: checked })
+      });
+      if (res.ok) {
+        setConversation(prev => ({ ...prev, ai_allowed: checked }));
+      }
+    } catch (err) {
+      console.error('Toggle AI error:', err);
+    }
+  };
+
+  const handleClearChat = async () => {
+    if (!conversation?.id || !confirm('Are you sure you want to clear this chat history?')) return;
+    try {
+      const res = await fetch(`/api/conversations/${conversation.id}/clear`, {
+        method: 'POST'
+      });
+      if (res.ok) {
+        setMessages([]);
+      }
+    } catch (err) {
+      console.error('Clear chat error:', err);
+    }
+  };
 
   const handleTyping = (isTyping) => {
     if (!conversation?.id) return;
@@ -187,7 +215,7 @@ export default function ConversationPage({ params }) {
     return (
       <DashboardLayout title="Conversation">
         <div className="flex items-center justify-center h-[60vh]">
-          <div className="w-8 h-8 border-2 border-voxy-primary/20 border-t-voxy-primary rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#00D18F]/20 border-t-[#00D18F] rounded-full animate-spin" />
         </div>
       </DashboardLayout>
     );
@@ -200,16 +228,23 @@ export default function ConversationPage({ params }) {
   return (
     <DashboardLayout title={`Chat with ${conversation?.customer_name || 'Customer'}`}>
       <div className="flex flex-col h-[calc(100vh-64px)] bg-[#0A0A0A]">
-        <ConversationHeader 
-          customerName={conversation?.customer_name}
+        <ChatHeader 
+          name={conversation?.customer_name}
           status={isCustomerOnline ? 'Active Now' : (conversation?.status || 'Offline')}
-          startTime={conversation?.created_at}
+          aiEnabled={conversation?.ai_allowed ?? true}
+          aiLabel="VOXY AI"
+          onToggleAi={handleToggleAi}
+          onClear={handleClearChat}
         />
         
         <MessageList 
           messages={messages} 
-          isTyping={isAiTyping} 
+          typingUser={isAiTyping ? 'customer' : null}
           typingAvatar={conversation?.customer_name?.charAt(0) || 'C'}
+          businessName={conversation?.business_name}
+          onTypeComplete={handleTypeComplete}
+          conversationId={conversation?.id}
+          isCustomerView={false}
         />
         
         <MessageInput 

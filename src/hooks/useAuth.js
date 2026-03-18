@@ -45,7 +45,11 @@ export const useAuth = () => {
       
       const data = await res.json();
       
-      if (!data.success) throw new Error(data.error || 'Registration failed');
+      if (!data.success) {
+        setError(data.error || 'Registration failed');
+        toast.error(data.error || 'Registration failed');
+        return data; 
+      }
       
       toast.success("Account created successfully!");
       return data;
@@ -71,7 +75,13 @@ export const useAuth = () => {
       
       const data = await res.json();
 
-      if (!data.success) throw new Error(data.error || 'Login failed');
+      if (!data.success) {
+        setError(data.error || 'Login failed');
+        if (!data.requiresVerification) {
+          toast.error(data.error || 'Login failed');
+        }
+        return data;
+      }
 
       setUser(data.user);
       toast.success("Welcome back!");

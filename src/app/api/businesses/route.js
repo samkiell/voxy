@@ -11,7 +11,7 @@ export async function GET(req) {
     // 1. PUBLIC QUERY: Fetch all verified/live businesses
     if (isPublic) {
       const result = await db.query(
-        'SELECT id, name, slug, description, category, custom_category, profile_completion, is_live, logo_url FROM businesses WHERE is_live = true'
+        'SELECT id, name, slug, description, category, custom_category, profile_completion, is_live, logo_url, use_ai_reply FROM businesses WHERE is_live = true'
       );
       return NextResponse.json({ 
         success: true, 
@@ -40,6 +40,8 @@ export async function GET(req) {
   }
 }
 
+import { buildBusinessSummary } from '@/lib/ai-context';
+
 export async function POST(req) {
   try {
     const user = await getUserFromCookie();
@@ -51,7 +53,7 @@ export async function POST(req) {
     const { 
       name, description, category, custom_category, 
       assistant_tone, assistant_instructions, business_hours,
-      profile_completion, is_live, logo_url
+      profile_completion, is_live, logo_url, use_ai_reply
     } = body;
 
     // Check if business exists
@@ -76,13 +78,13 @@ export async function POST(req) {
           custom_category = $4, assistant_tone = $5, 
           assistant_instructions = $6, business_hours = $7,
           profile_completion = $8, is_live = $9, logo_url = $11,
-          slug = $12,
+          slug = $12, use_ai_reply = $13,
           updated_at = CURRENT_TIMESTAMP
         WHERE owner_id = $10 RETURNING *`,
         [
           name, description, category, custom_category, 
           assistant_tone, assistant_instructions, JSON.stringify(business_hours),
-          profile_completion, is_live, user.id, logo_url, slug
+          profile_completion, is_live, user.id, logo_url, slug, use_ai_reply
         ]
       );
     } else {
@@ -92,14 +94,20 @@ export async function POST(req) {
         `INSERT INTO businesses (
           owner_id, name, description, category, 
           custom_category, assistant_tone, assistant_instructions, 
-          business_hours, profile_completion, is_live, logo_url, slug
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+          business_hours, profile_completion, is_live, logo_url, slug, use_ai_reply
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
         [
           user.id, name, description, category, 
           custom_category, assistant_tone, assistant_instructions, 
-          JSON.stringify(business_hours), profile_completion, is_live, logo_url, slug
+          JSON.stringify(business_hours), profile_completion, is_live, logo_url, slug, use_ai_reply
         ]
       );
+    }
+
+    // [CRITICAL] Recalculate AI Summary to sync with new settings
+    if (result.rows[0]) {
+      console.log(`[AI-SYNC] Recalculating summary for business ${result.rows[0].id}...`);
+      await buildBusinessSummary(result.rows[0].id);
     }
 
     return NextResponse.json({ 

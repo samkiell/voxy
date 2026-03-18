@@ -16,7 +16,7 @@ export async function POST(req) {
 
     // 2. Find user
     const result = await db.query(
-      'SELECT id, name, email, password_hash, role FROM users WHERE email = $1',
+      'SELECT id, name, email, password_hash, role, is_verified FROM users WHERE email = $1',
       [email]
     );
 
@@ -35,6 +35,19 @@ export async function POST(req) {
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
         { status: 401 }
+      );
+    }
+
+    // 3b. Check verification status
+    if (!user.is_verified) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Please verify your account before logging in.', 
+          requiresVerification: true,
+          email: user.email 
+        },
+        { status: 403 }
       );
     }
 

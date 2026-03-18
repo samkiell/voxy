@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
@@ -15,8 +16,29 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function Sidebar({ isOpen, onClose }) {
   const { logout, user } = useAuth();
+  const [unreadCount, setUnreadCount] = useState(0);
   const role = user?.role || 'customer';
   const pathname = usePathname();
+
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await fetch('/api/conversations/unread-count');
+      const data = await res.json();
+      if (data.success) {
+        setUnreadCount(data.count);
+      }
+    } catch (err) {
+      console.error('Error fetching unread count:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchUnreadCount();
+      const interval = setInterval(fetchUnreadCount, 15000); // 15s refresh
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const getNavItems = () => {
     if (role === 'admin') {
@@ -27,7 +49,7 @@ export default function Sidebar({ isOpen, onClose }) {
       ];
     } else if (role === 'customer') {
       return [
-        { name: 'Chat', href: '/customer/chat', icon: MessageSquare },
+        { name: 'Chat', href: '/customer/chat', icon: MessageSquare, badge: unreadCount },
         { name: 'Find Business', href: '/customer/find-business', icon: Building2 },
         { name: 'Bookmarks', href: '/customer/bookmarks', icon: Bookmark },
         { name: 'Settings', href: '/customer/settings', icon: Settings },
@@ -35,7 +57,7 @@ export default function Sidebar({ isOpen, onClose }) {
     } else {
       return [
         { name: 'Dashboard', href: '/business/dashboard', icon: LayoutDashboard },
-        { name: 'Conversations', href: '/business/conversation', icon: MessageCircle },
+        { name: 'Conversations', href: '/business/conversation', icon: MessageCircle, badge: unreadCount },
         { name: 'Settings', href: '/business/settings', icon: Settings },
       ];
     }
@@ -84,14 +106,19 @@ export default function Sidebar({ isOpen, onClose }) {
                 key={item.name} 
                 href={item.href} 
                 onClick={() => onClose?.()}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
                   isActive 
                     ? "bg-[#111111] text-[#00D18F]" 
                     : "text-zinc-400 hover:text-white hover:bg-[#0a0a0a]"
                 }`}
               >
                 <item.icon className={`w-5 h-5 transition-colors ${isActive ? "text-[#00D18F]" : "text-white/60 group-hover:text-white"}`} />
-                <span className="font-semibold text-sm tracking-wide">{item.name}</span>
+                <span className="font-semibold text-sm tracking-wide flex-1">{item.name}</span>
+                {item.badge > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-[#00D18F] text-black text-[10px] font-black min-w-[1.25rem] text-center shadow-[0_0_12px_rgba(0,209,143,0.3)] animate-pulse">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}

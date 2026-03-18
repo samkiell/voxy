@@ -17,7 +17,7 @@ const dmSerif = DM_Serif_Display({
 });
 
 export const metadata = {
-  title: "Voxy AI — Multilingual Voice Assistant for Small Businesses",
+  title: "Voxy — Multilingual Voice Assistant for Small Businesses",
   description:
     "Voxy converts WhatsApp voice notes in English, Pidgin, and Yoruba into text and generates ready-to-send replies for your business.",
   icons: {

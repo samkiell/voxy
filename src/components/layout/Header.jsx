@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { Bell, Menu } from 'lucide-react';
+import { Menu, CircleUser } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import NotificationsPopover from './NotificationsPopover';
 
 export default function Header({ title, onMenuClick, businessLogo }) {
   return (
@@ -20,19 +21,21 @@ export default function Header({ title, onMenuClick, businessLogo }) {
 
       <div className="flex items-center gap-4 sm:gap-6">
         <ThemeToggle />
-        <button className="p-3 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-2xl transition-all text-zinc-400 relative group active:scale-95">
-          <Bell className="w-6 h-6" />
-        </button>
+        <NotificationsPopover />
         
         <Link 
           href="/business/profile"
-          className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 overflow-hidden border border-zinc-200 dark:border-white/10 flex-shrink-0 shadow-sm group cursor-pointer transition-all duration-300 hover:border-[#00D18F]/30"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 overflow-hidden border border-zinc-200 dark:border-white/10 flex-shrink-0 shadow-sm group cursor-pointer transition-all duration-300 hover:border-[#00D18F]/30 flex items-center justify-center"
         >
-          <img 
-            src={businessLogo || "https://api.dicebear.com/7.x/avataaars/svg?seed=Samkiel"} 
-            alt="Business Logo" 
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-          />
+          {businessLogo ? (
+            <img 
+              src={businessLogo} 
+              alt="Business Logo" 
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+            />
+          ) : (
+            <CircleUser className="w-6 h-6 text-zinc-400 dark:text-zinc-500 group-hover:text-[#00D18F] transition-colors" />
+          )}
         </Link>
       </div>
     </header>
