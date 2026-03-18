@@ -19,6 +19,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const role = user?.role || 'customer';
   const pathname = usePathname();
+  const role = pathname.startsWith('/lighthouse') ? 'admin' : (user?.role || 'customer');
 
   const fetchUnreadCount = async () => {
     try {
@@ -137,7 +138,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
           {/* User Profile */}
           <Link 
-            href={(role === 'business' || role === 'business_owner') ? '/business/settings' : (role === 'customer' ? '/customer/settings' : pathname)}
+            href={role === 'admin' ? '/lighthouse/profile' : (role === 'business' || role === 'business_owner' ? '/business/settings' : '/customer/settings')}
             className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-[#0a0a0a] border border-white/5 mt-2 hover:border-[#00D18F]/30 transition-all group/profile"
           >
             <div className="size-10 rounded-full bg-[#00D18F] flex items-center justify-center text-black font-bold text-sm">
