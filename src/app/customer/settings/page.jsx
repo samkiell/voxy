@@ -69,10 +69,10 @@ export default function CustomerSettingsPage() {
 
   return (
     <DashboardLayout title="Settings">
-      <div className="max-w-2xl mx-auto px-4 py-8 sm:p-10 space-y-8 sm:space-y-10 animate-in fade-in duration-500">
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">Settings</h1>
-          <p className="text-[10px] sm:text-xs font-medium text-zinc-500 uppercase tracking-[0.3em]">Configure your experience</p>
+      <div className="max-w-2xl mx-auto px-1 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-10 animate-in fade-in duration-500">
+        <div className="space-y-1.5 px-3 sm:px-0">
+          <h1 className="text-[1.75rem] sm:text-4xl font-bold tracking-tight text-white leading-tight">Settings</h1>
+          <p className="text-[9px] sm:text-xs font-semibold text-zinc-500 uppercase tracking-[0.2em] opacity-80">Configure your experience</p>
         </div>
 
         <div className="space-y-3">

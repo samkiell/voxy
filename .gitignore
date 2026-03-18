@@ -24,3 +24,4 @@ yarn-error.log*
 .agents
 skills-lock.json
 skills.json
+public/temp_voice
