@@ -17,7 +17,6 @@ import { useAuth } from '@/hooks/useAuth';
 export default function Sidebar({ isOpen, onClose }) {
   const { logout, user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
-  const role = user?.role || 'customer';
   const pathname = usePathname();
   const role = pathname.startsWith('/lighthouse') ? 'admin' : (user?.role || 'customer');
 
