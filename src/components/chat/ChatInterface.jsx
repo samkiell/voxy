@@ -306,7 +306,7 @@ export default function ChatInterface({ business, userName }) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-black rounded-3xl md:rounded-[3.5rem] overflow-hidden shadow-2xl border border-white/5 transition-all duration-700 animate-in fade-in zoom-in-95">
+    <div className="flex flex-col h-full bg-black rounded-2xl md:rounded-[3.5rem] overflow-hidden shadow-2xl border border-white/5 transition-all duration-700 animate-in fade-in zoom-in-95 w-full">
       <ChatHeader 
         name={business?.name}
         status={isBusinessOnline ? 'Online' : 'Away'}

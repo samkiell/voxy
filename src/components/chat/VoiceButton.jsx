@@ -24,7 +24,7 @@ export const VoiceButton = ({ onAudioReady, isLoading }) => {
         type="button"
         disabled={busy}
         onClick={handleToggleRecording}
-        className={`size-12 sm:size-16 rounded-2xl sm:rounded-3xl font-bold flex items-center justify-center transition-all duration-500 shadow-xl shrink-0 ${
+        className={`size-10 sm:size-12 md:size-16 rounded-xl sm:rounded-2xl md:rounded-3xl font-bold flex items-center justify-center transition-all duration-500 shadow-xl shrink-0 ${
           isRecording 
             ? 'bg-red-500 text-white hover:bg-red-600 animate-pulse shadow-red-500/20' 
             : busy
@@ -34,11 +34,11 @@ export const VoiceButton = ({ onAudioReady, isLoading }) => {
         title={error ? error : isRecording ? "Stop Recording" : "Start Voice Message"}
       >
         {busy ? (
-          <Loader2 className="size-5 sm:size-6 animate-spin text-[#00D18F]" />
+          <Loader2 className="size-4 sm:size-5 md:size-6 animate-spin text-[#00D18F]" />
         ) : isRecording ? (
-          <Square className="size-5 sm:size-6 transition-transform duration-500 fill-current" />
+          <Square className="size-4 sm:size-5 md:size-6 transition-transform duration-500 fill-current" />
         ) : (
-          <Mic className="size-5 sm:size-6 transition-transform duration-500" strokeWidth={3} />
+          <Mic className="size-4 sm:size-5 md:size-6 transition-transform duration-500" strokeWidth={3} />
         )}
       </button>
 
