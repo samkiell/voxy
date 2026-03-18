@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
-import ConversationHeader from '@/components/conversation/ConversationHeader';
+import ChatHeader from '@/components/conversation/ChatHeader';
 import MessageList from '@/components/conversation/MessageList';
 import MessageInput from '@/components/conversation/MessageInput';
 import { Loader2 } from 'lucide-react';
@@ -228,21 +228,23 @@ export default function ConversationPage({ params }) {
   return (
     <DashboardLayout title={`Chat with ${conversation?.customer_name || 'Customer'}`}>
       <div className="flex flex-col h-[calc(100vh-64px)] bg-[#0A0A0A]">
-        <ConversationHeader 
-          customerName={conversation?.customer_name}
+        <ChatHeader 
+          name={conversation?.customer_name}
           status={isCustomerOnline ? 'Active Now' : (conversation?.status || 'Offline')}
-          startTime={conversation?.created_at}
           aiEnabled={conversation?.ai_allowed ?? true}
+          aiLabel="VOXY AI"
           onToggleAi={handleToggleAi}
           onClear={handleClearChat}
         />
         
         <MessageList 
           messages={messages} 
-          isTyping={isAiTyping} 
+          typingUser={isAiTyping ? 'customer' : null}
           typingAvatar={conversation?.customer_name?.charAt(0) || 'C'}
           businessName={conversation?.business_name}
           onTypeComplete={handleTypeComplete}
+          conversationId={conversation?.id}
+          isCustomerView={false}
         />
         
         <MessageInput 
