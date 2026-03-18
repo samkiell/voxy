@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import OpenAI from 'openai';
+import * as googleTTS from 'google-tts-api';
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
@@ -8,19 +8,31 @@ import crypto from 'crypto';
 // Import the existing chat handler to prevent logic duplication
 import { POST as handleChatGenerate } from '@/app/api/assistant/chat/route';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-async function transcribeAudio(audioFile) {
+async function transcribeAudio(audioBlob) {
   try {
-    const transcription = await openai.audio.transcriptions.create({
-      file: audioFile,
-      model: "whisper-1",
+    const formData = new FormData();
+    formData.append("file", audioBlob, "audio.webm");
+    // Groq's high-speed Whisper model
+    formData.append("model", "whisper-large-v3-turbo"); 
+
+    const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: formData
     });
-    return transcription.text;
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("Groq STT Error Object:", errText);
+      throw new Error(`Groq API returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.text;
   } catch (error) {
-    console.error('Whisper STT Error:', error);
+    console.error('Groq STT Error:', error);
     throw new Error('Speech-to-Text conversion failed');
   }
 }
@@ -53,13 +65,17 @@ async function generateChatResponse(conversationId, transcript) {
 
 async function generateSpeech(text) {
   try {
-    const mp3 = await openai.audio.speech.create({
-      model: "tts-1",
-      voice: "alloy",
-      input: text,
+    // google-tts-api breaks down text > 200 chars automatically
+    const base64Array = await googleTTS.getAllAudioBase64(text, {
+      lang: 'en',
+      slow: false,
+      host: 'https://translate.google.com',
+      splitPunct: ',.?',
     });
 
-    const buffer = Buffer.from(await mp3.arrayBuffer());
+    // Convert all base64 chunks to buffers and combine them
+    const buffers = base64Array.map(item => Buffer.from(item.base64, 'base64'));
+    const finalBuffer = Buffer.concat(buffers);
     
     // Create a local temp file in the public directory to serve directly
     const tempFileName = `tts_${crypto.randomBytes(8).toString('hex')}.mp3`;
@@ -69,7 +85,7 @@ async function generateSpeech(text) {
     await fs.mkdir(tempDir, { recursive: true }).catch(() => {});
     
     const filePath = path.join(tempDir, tempFileName);
-    await fs.writeFile(filePath, buffer);
+    await fs.writeFile(filePath, finalBuffer);
     
     return `/temp_voice/${tempFileName}`;
   } catch (error) {
@@ -88,14 +104,8 @@ export async function POST(req) {
       return NextResponse.json({ success: false, error: 'Audio file and conversation ID are required' }, { status: 400 });
     }
 
-    // Convert Blob to File object for OpenAI API
-    const audioBuffer = Buffer.from(await audioBlob.arrayBuffer());
-    const audioFile = new File([audioBuffer], "audio.webm", {
-       type: audioBlob.type || 'audio/webm',
-    });
-
-    // 1. Convert Audio to Text (STT)
-    const transcript = await transcribeAudio(audioFile);
+    // 1. Convert Audio to Text (using Groq Whisper)
+    const transcript = await transcribeAudio(audioBlob);
     if (!transcript.trim()) {
       return NextResponse.json({ success: false, error: 'Could not transcribe any speech' }, { status: 400 });
     }
@@ -106,7 +116,7 @@ export async function POST(req) {
     const aiResponseText = await generateChatResponse(conversationId, transcript);
     console.log(`[VOICE] AI Response: "${aiResponseText}"`);
 
-    // 3. Convert Text to Speech (TTS)
+    // 3. Convert Text to Speech (using Google TTS)
     let audioUrl = null;
     if (aiResponseText) {
       audioUrl = await generateSpeech(aiResponseText);
