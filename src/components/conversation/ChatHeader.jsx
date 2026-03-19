@@ -2,9 +2,10 @@ import { ChevronLeft, MoreVertical, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // Added Link
 import { useState, useRef, useEffect } from 'react';
 
-const ChatHeader = ({ name, status, icon: Icon, aiEnabled, aiLabel = "AI", onToggleAi, onClear, showBack, backUrl }) => {
+const ChatHeader = ({ name, status, icon: Icon, aiEnabled, aiLabel = "AI", onToggleAi, onClear, showBack, backUrl, businessSlug }) => {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
@@ -35,11 +36,11 @@ const ChatHeader = ({ name, status, icon: Icon, aiEnabled, aiLabel = "AI", onTog
           </Button>
         )}
         
-        <div className="flex items-center gap-2.5 min-w-0">
+        <Link href={`/customer/business/${businessSlug}`} className="flex items-center gap-2.5 min-w-0 group/header">
           <div className="relative flex-shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center overflow-hidden shadow-inner">
+            <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center overflow-hidden shadow-inner group-hover/header:border-[#00D18F]/50 transition-colors">
               {typeof Icon === 'string' ? (
-                <img src={Icon} alt={name} className="w-full h-full object-cover" />
+                <img src={Icon} alt={name} className="w-full h-full object-cover group-hover/header:scale-110 transition-transform duration-500" />
               ) : Icon ? (
                 <Icon className="w-4 h-4 text-[#00D18F]" />
               ) : (
@@ -52,14 +53,14 @@ const ChatHeader = ({ name, status, icon: Icon, aiEnabled, aiLabel = "AI", onTog
           </div>
           
           <div className="min-w-0">
-            <h1 className="text-sm font-bold text-zinc-900 dark:text-white truncate leading-none mb-1">
+            <h1 className="text-sm font-bold text-zinc-900 dark:text-white truncate leading-none mb-1 group-hover/header:text-[#00D18F] transition-colors">
               {name || 'Business'}
             </h1>
             <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-widest whitespace-nowrap">
               {isOnline ? 'Online' : 'AI Assistant'}
             </span>
           </div>
-        </div>
+        </Link>
       </div>
 
       <div className="flex items-center gap-3">

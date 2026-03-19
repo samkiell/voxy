@@ -5,10 +5,12 @@ import Link from 'next/link';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Plus, MessageSquare, ChevronRight, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function CustomerChatHistoryPage() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter(); // Initialize router
 
   useEffect(() => {
     const fetchConversations = async (isInitial = false) => {
@@ -62,12 +64,16 @@ export default function CustomerChatHistoryPage() {
             </div>
           ) : conversations.length > 0 ? (
             conversations.map((chat) => (
-              <Link key={chat.id} href={`/customer/chat/${chat.business_slug}`} className="block">
-                <div className="group bg-white dark:bg-zinc-950/50 border border-zinc-200 dark:border-white/5 p-4 sm:p-6 rounded-3xl flex items-center gap-4 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-300 dark:hover:border-white/10 active:scale-[0.99] shadow-sm hover:shadow-xl dark:shadow-none">
-                  <div className="relative shrink-0">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center overflow-hidden shadow-inner">
+              <div 
+                key={chat.id} 
+                className="group bg-white dark:bg-zinc-950/50 border border-zinc-200 dark:border-white/5 p-4 sm:p-6 rounded-3xl flex items-center gap-4 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-300 dark:hover:border-white/10 active:scale-[0.99] shadow-sm hover:shadow-xl dark:shadow-none cursor-pointer"
+                onClick={() => router.push(`/customer/chat/${chat.business_slug}`)}
+              >
+                <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <Link href={`/customer/business/${chat.business_slug}`}>
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center overflow-hidden shadow-inner hover:border-[#00D18F]/50 transition-colors">
                       {chat.business_logo_url ? (
-                        <img src={chat.business_logo_url} alt={chat.business_name} className="w-full h-full object-cover" />
+                        <img src={chat.business_logo_url} alt={chat.business_name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-[#00D18F]/10">
                           <span className="text-[#00D18F] font-bold text-lg sm:text-2xl tracking-tighter">
@@ -76,32 +82,32 @@ export default function CustomerChatHistoryPage() {
                         </div>
                       )}
                     </div>
-                    {chat.unread_count > 0 && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#00D18F] text-black text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-black">
-                        {chat.unread_count}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-sm sm:text-lg font-bold text-zinc-900 dark:text-white truncate group-hover:text-[#00D18F] transition-colors leading-tight">
-                        {chat.business_name}
-                      </h3>
-                      <span className="text-[10px] text-zinc-600 font-medium">
-                        {new Date(chat.last_message_at || chat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                  </Link>
+                  {chat.unread_count > 0 && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#00D18F] text-black text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-black">
+                      {chat.unread_count}
                     </div>
-                    <p className="text-xs sm:text-sm text-zinc-500 truncate leading-relaxed">
-                      {chat.last_message?.startsWith('[img]') ? '📷 Photo' : (chat.last_message || 'Continue your conversation...')}
-                    </p>
-                  </div>
-
-                  <div className="shrink-0 text-zinc-800 group-hover:text-zinc-600 transition-colors">
-                    <ChevronRight size={20} />
-                  </div>
+                  )}
                 </div>
-              </Link>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm sm:text-lg font-bold text-zinc-900 dark:text-white truncate group-hover:text-[#00D18F] transition-colors leading-tight">
+                      {chat.business_name}
+                    </h3>
+                    <span className="text-[10px] text-zinc-600 font-medium whitespace-nowrap">
+                      {new Date(chat.last_message_at || chat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-zinc-500 truncate leading-relaxed">
+                    {chat.last_message?.startsWith('[img]') ? '📷 Photo' : (chat.last_message || 'Continue your conversation...')}
+                  </p>
+                </div>
+
+                <div className="shrink-0 text-zinc-800 group-hover:text-zinc-600 transition-colors">
+                  <ChevronRight size={20} />
+                </div>
+              </div>
             ))
           ) : (
             <div className="text-center py-24 bg-zinc-50 dark:bg-zinc-950/30 rounded-[3rem] border border-dashed border-zinc-200 dark:border-white/5">

@@ -27,7 +27,7 @@ import { notFound } from 'next/navigation';
 
 export default function BusinessProfilePage({ params }) {
   const resolvedParams = use(params);
-  const { id } = resolvedParams;
+  const { slug } = resolvedParams;
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,15 +35,12 @@ export default function BusinessProfilePage({ params }) {
     const fetchBusiness = async () => {
       try {
         setLoading(true);
-        const res = await fetch('/api/businesses?public=true');
+        const res = await fetch(`/api/businesses?slug=${slug}`);
         const data = await res.json();
-        if (data.success) {
-          const found = data.businesses.find(b => b.id === id);
-          if (found) {
-            setBusiness(found);
-          } else {
-            setBusiness(false); // Trigger not found
-          }
+        if (data.success && data.business) {
+          setBusiness(data.business);
+        } else {
+          setBusiness(false); // Trigger not found
         }
       } catch (err) {
         console.error('Fetch error:', err);
@@ -53,7 +50,7 @@ export default function BusinessProfilePage({ params }) {
     };
 
     fetchBusiness();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -117,7 +114,7 @@ export default function BusinessProfilePage({ params }) {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              <Link href={`/customer/chat/${business?.id}`} className="w-full">
+              <Link href={`/customer/chat/${business?.slug}`} className="w-full">
                 <Button className="w-full bg-[#00D18F] hover:bg-[#00A370] text-white rounded-xl h-14 sm:h-16 px-8 sm:px-10 shadow-2xl shadow-[#00D18F]/20 transition-all active:scale-95 group">
                   <MessageSquare className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
                   <span className="font-black uppercase tracking-widest text-[10px] sm:text-xs">Start Chat</span>
