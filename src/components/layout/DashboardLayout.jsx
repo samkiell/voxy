@@ -66,7 +66,7 @@ export default function DashboardLayout({ children, title }) {
         <Header 
           title={title || 'Voxy'} 
           onMenuClick={() => setIsSidebarOpen(true)}
-          businessLogo={user?.business?.logo_url}
+          user={user}
           showNotifications={!isCustomer}
         />
         <main className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col relative w-full">

@@ -3,7 +3,9 @@ import { Menu, CircleUser } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import NotificationsPopover from './NotificationsPopover';
 
-export default function Header({ title, onMenuClick, businessLogo, showNotifications = true }) {
+export default function Header({ title, onMenuClick, user, showNotifications = true }) {
+  const userInitials = (user?.full_name || user?.name || user?.email || 'V')?.charAt(0).toUpperCase();
+
   return (
     <header className="h-16 border-b border-zinc-100 dark:border-white/5 bg-white/80 dark:bg-black/80 backdrop-blur-3xl flex items-center justify-between px-6 sm:px-10 sticky top-0 z-50 transition-all duration-500">
       <div className="flex items-center gap-6">
@@ -23,20 +25,28 @@ export default function Header({ title, onMenuClick, businessLogo, showNotificat
         <ThemeToggle />
         {showNotifications && <NotificationsPopover />}
         
-        <Link 
-          href="/business/profile"
-          className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 overflow-hidden border border-zinc-200 dark:border-white/10 flex-shrink-0 shadow-sm group cursor-pointer transition-all duration-300 hover:border-[#00D18F]/30 flex items-center justify-center"
-        >
-          {businessLogo ? (
-            <img 
-              src={businessLogo} 
-              alt="Business Logo" 
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-            />
-          ) : (
-            <CircleUser className="w-6 h-6 text-zinc-400 dark:text-zinc-500 group-hover:text-[#00D18F] transition-colors" />
-          )}
-        </Link>
+        {user?.role === 'customer' ? (
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-voxy-primary/10 border border-voxy-primary/20 flex items-center justify-center">
+            <span className="text-voxy-primary font-black text-lg">
+              {userInitials}
+            </span>
+          </div>
+        ) : (
+          <Link 
+            href="/business/profile"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-zinc-100 dark:bg-zinc-900 overflow-hidden border border-zinc-200 dark:border-white/10 flex-shrink-0 shadow-sm group cursor-pointer transition-all duration-300 hover:border-[#00D18F]/30 flex items-center justify-center"
+          >
+            {user?.business?.logo_url ? (
+              <img 
+                src={user.business.logo_url} 
+                alt="Business Logo" 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+              />
+            ) : (
+              <CircleUser className="w-6 h-6 text-zinc-400 dark:text-zinc-500 group-hover:text-[#00D18F] transition-colors" />
+            )}
+          </Link>
+        )}
       </div>
     </header>
   );
