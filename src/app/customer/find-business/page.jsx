@@ -68,44 +68,48 @@ export default function FindBusinessPage() {
                 key={business.id}
                 className="group bg-white dark:bg-zinc-950/50 border border-zinc-200 dark:border-white/5 rounded-3xl overflow-hidden hover:border-[#00D18F]/30 transition-all flex flex-col shadow-sm hover:shadow-xl dark:shadow-none"
               >
-                <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center border-b border-zinc-200 dark:border-white/5 overflow-hidden relative">
-                  {business.logo_url ? (
-                    <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  ) : (
-                    <div className="w-16 h-16 rounded-2xl bg-white dark:bg-black border border-zinc-200 dark:border-white/5 flex items-center justify-center text-[#00D18F]/20 text-2xl font-black italic shadow-inner">VOXY</div>
-                  )}
-                </div>
+                <Link href={`/customer/business/${business.slug}`} className="flex-1 flex flex-col">
+                  <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center border-b border-zinc-200 dark:border-white/5 overflow-hidden relative">
+                    {business.logo_url ? (
+                      <img src={business.logo_url} alt={business.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-white dark:bg-black border border-zinc-200 dark:border-white/5 flex items-center justify-center text-[#00D18F]/20 text-2xl font-black italic shadow-inner">VOXY</div>
+                    )}
+                  </div>
 
-                <div className="p-6 flex-1 flex flex-col">
-                  <div className="flex justify-between items-start gap-4 mb-4">
-                    <div className="min-w-0">
-                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white truncate group-hover:text-[#00D18F] transition-colors">
-                        {business.name}
-                      </h3>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <MapPin size={12} className="text-[#00D18F]" />
-                        <span className="text-[10px] text-zinc-500 font-medium truncate">Lagos, Nigeria</span>
+                  <div className="p-6 flex-1">
+                    <div className="flex justify-between items-start gap-4 mb-4">
+                      <div className="min-w-0">
+                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white truncate group-hover:text-[#00D18F] transition-colors">
+                          {business.name}
+                        </h3>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <MapPin size={12} className="text-[#00D18F]" />
+                          <span className="text-[10px] text-zinc-500 font-medium truncate">
+                            {business.address || "Global Service"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 bg-amber-400/10 px-2 py-0.5 rounded-lg text-amber-500 shrink-0">
+                        <Star size={10} fill="currentColor" />
+                        <span className="text-[10px] font-bold">4.8</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 bg-amber-400/10 px-2 py-0.5 rounded-lg text-amber-500 shrink-0">
-                      <Star size={10} fill="currentColor" />
-                      <span className="text-[10px] font-bold">4.8</span>
-                    </div>
                   </div>
+                </Link>
 
-                  <div className="mt-auto pt-6 flex items-center justify-between border-t border-zinc-200 dark:border-white/5">
-                    <span className="text-[9px] font-bold text-[#00D18F] uppercase tracking-widest flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00D18F] animate-pulse" />
-                      Active Now
-                    </span>
+                <div className="px-6 pb-6 pt-0 flex items-center justify-between border-t border-zinc-200 dark:border-white/5 mt-auto">
+                  <span className="text-[9px] font-bold text-[#00D18F] uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00D18F] animate-pulse" />
+                    Active Now
+                  </span>
 
-                    <Link href={`/customer/chat/${business.slug}`}>
-                      <Button className="bg-[#00D18F]/10 hover:bg-[#00D18F]/20 text-[#00D18F] border border-[#00D18F]/20 rounded-xl h-9 px-4 text-[10px] font-bold uppercase tracking-widest transition-all">
-                        <MessageSquare className="w-3.5 h-3.5 mr-2" />
-                        Chat
-                      </Button>
-                    </Link>
-                  </div>
+                  <Link href={`/customer/chat/${business.slug}`}>
+                    <Button className="bg-[#00D18F]/10 hover:bg-[#00D18F]/20 text-[#00D18F] border border-[#00D18F]/20 rounded-xl h-9 px-4 text-[10px] font-bold uppercase tracking-widest transition-all">
+                      <MessageSquare className="w-3.5 h-3.5 mr-2" />
+                      Chat
+                    </Button>
+                  </Link>
                 </div>
               </div>
             ))}

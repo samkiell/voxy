@@ -388,6 +388,7 @@ export default function ChatInterface({ business, userName }) {
         onClear={handleClearChat}
         showBack={true}
         backUrl="/customer/chat"
+        businessSlug={business?.slug}
       />
 
       <div className="flex-1 overflow-hidden relative flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors duration-500">
