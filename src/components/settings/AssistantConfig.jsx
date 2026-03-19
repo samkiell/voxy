@@ -1,6 +1,6 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Bot, MessageSquareText, Sparkles } from 'lucide-react';
+import { Bot, MessageSquareText, Sparkles, HelpCircle } from 'lucide-react';
 
 const TONES = [
   'Friendly',
@@ -49,8 +49,17 @@ const AssistantConfig = ({ data, onChange }) => {
         </div>
 
         <div className="space-y-4 pt-6 border-t border-zinc-100 dark:border-white/[0.03]">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Label htmlFor="assistant_instructions" className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide ml-1">Specific instructions</Label>
+            <div className="group relative">
+              <HelpCircle size={14} className="text-zinc-300 dark:text-zinc-800 cursor-help hover:text-[#00D18F] transition-colors" />
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[70]">
+                <p className="text-[11px] text-zinc-400 leading-relaxed">
+                  These instructions act as the <span className="text-white font-bold">soul of your AI</span>. They define its knowledge, boundaries, and how it handles specific customer queries. Be as detailed as possible to ensure accurate responses.
+                </p>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-zinc-900"></div>
+              </div>
+            </div>
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-600 font-medium leading-relaxed max-w-sm mb-4">Detailed behavioral rules or information the AI should follow.</p>
           <div className="relative group">
