@@ -14,7 +14,7 @@ export default function Header({ title, onMenuClick, businessLogo, showNotificat
           <Menu className="w-6 h-6" />
         </button>
 
-        <h1 className="text-base sm:text-lg font-semibold text-white tracking-tight truncate">
+        <h1 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-white tracking-tight truncate">
           {title}
         </h1>
       </div>
