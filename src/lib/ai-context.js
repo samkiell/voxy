@@ -7,7 +7,7 @@ import { generateAIResponse } from './ai/core/generateAIResponse';
  * Call this when a business profile is created or updated.
  */
 export async function buildBusinessSummary(businessId) {
-  const res = await db.query('SELECT name, category, description, business_hours, assistant_tone, assistant_instructions FROM businesses WHERE id = $1', [businessId]);
+  const res = await db.query('SELECT name, category, description, business_hours, assistant_tone, assistant_instructions, phone, state, lga, street_address FROM businesses WHERE id = $1', [businessId]);
   if (res.rowCount === 0) return null;
 
   const b = res.rows[0];
@@ -37,13 +37,17 @@ export async function buildBusinessSummary(businessId) {
     }
   }
 
+  const locationStr = [b.street_address, b.lga, b.state].filter(Boolean).join(', ') || 'Not specified.';
+
   const compressionPrompt = `
-Compress the following business profile into a dense, AI-friendly system prompt (max 80-100 tokens). 
-Include exactly: name, category, short description, business hours, tone, and key assistant instructions. 
+Compress the following business profile into a dense, AI-friendly system prompt (max 100-120 tokens). 
+Include exactly: name, category, phone number, location, short description, business hours, tone, and key assistant instructions. 
 Do not talk in the first person. Output ONLY the compressed summary.
 
 Name: ${b.name}
 Category: ${b.category}
+Phone: ${b.phone || 'Not specified'}
+Location: ${locationStr}
 Description: ${b.description}
 Hours: ${hoursStr}
 Tone: ${b.assistant_tone}
@@ -60,9 +64,9 @@ Instructions: ${b.assistant_instructions}
   } catch (error) {
     console.error('Error generating AI business summary:', error);
     // fallback if AI fails
-    aiSummary = `${b.name} (${b.category}). ${b.description}. Hours: ${hoursStr}. Tone: ${b.assistant_tone}. Rules: ${b.assistant_instructions}`;
+    aiSummary = `${b.name} (${b.category}). Phone: ${b.phone || 'N/A'}. Location: ${locationStr}. ${b.description}. Hours: ${hoursStr}. Tone: ${b.assistant_tone}. Rules: ${b.assistant_instructions}`;
     // Truncate fallback to stay near limit
-    if (aiSummary.length > 500) aiSummary = aiSummary.substring(0, 500) + '...';
+    if (aiSummary.length > 600) aiSummary = aiSummary.substring(0, 600) + '...';
     await db.query('UPDATE businesses SET ai_summary = $1 WHERE id = $2', [aiSummary, businessId]);
     return aiSummary;
   }

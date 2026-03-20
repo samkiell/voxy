@@ -24,15 +24,25 @@ const CATEGORIES = [
 
 import ImageUpload from './ImageUpload';
 
+import { NIGERIA_STATES } from '@/lib/nigeria-states';
+
 const BusinessInfoForm = ({ data, onChange }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    onChange({ ...data, [name]: value });
+    // When state changes, reset LGA
+    if (name === 'state') {
+      onChange({ ...data, state: value, lga: '' });
+    } else {
+      onChange({ ...data, [name]: value });
+    }
   };
 
   const handleLogoUpload = (url) => {
     onChange({ ...data, logo_url: url });
   };
+
+  const selectedState = NIGERIA_STATES.find(s => s.name === data.state);
+  const lgaOptions = selectedState ? selectedState.lgas : [];
 
   return (
     <div className="bg-white dark:bg-[#0A0A0A] border border-zinc-200 dark:border-white/5 rounded-2xl p-6 shadow-sm transition-colors duration-500">
@@ -72,14 +82,50 @@ const BusinessInfoForm = ({ data, onChange }) => {
                 className="bg-zinc-50 dark:bg-white/5 border-zinc-100 dark:border-white/5 h-12 rounded-xl focus:border-[#00D18F]/40 text-sm font-medium transition-all text-zinc-900 dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-800"
               />
             </div>
+            
             <div className="space-y-2.5">
-              <Label htmlFor="address" className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide ml-1">Physical Address</Label>
-              <Input
-                id="address"
-                name="address"
-                value={data.address || ''}
+              <Label htmlFor="state" className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide ml-1">State</Label>
+              <select
+                id="state"
+                name="state"
+                value={data.state || ''}
                 onChange={handleInputChange}
-                placeholder="e.g. 123 Tech Hub, Lagos"
+                className="flex h-12 w-full rounded-xl border border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-white/5 px-4 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-[#00D18F]/40 transition-all font-medium"
+              >
+                <option value="">Select state</option>
+                {NIGERIA_STATES.map((s) => (
+                  <option key={s.name} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2.5">
+              <Label htmlFor="lga" className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide ml-1">LGA</Label>
+              <select
+                id="lga"
+                name="lga"
+                value={data.lga || ''}
+                onChange={handleInputChange}
+                disabled={!data.state}
+                className="flex h-12 w-full rounded-xl border border-zinc-100 dark:border-white/5 bg-zinc-50 dark:bg-white/5 px-4 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-[#00D18F]/40 transition-all font-medium disabled:opacity-50"
+              >
+                <option value="">Select LGA</option>
+                {lgaOptions.map((lga) => (
+                  <option key={lga} value={lga}>{lga}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2.5">
+              <Label htmlFor="street_address" className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide ml-1">Street Address</Label>
+              <Input
+                id="street_address"
+                name="street_address"
+                value={data.street_address || ''}
+                onChange={handleInputChange}
+                placeholder="e.g. 123 Tech Hub"
                 className="bg-zinc-50 dark:bg-white/5 border-zinc-100 dark:border-white/5 h-12 rounded-xl focus:border-[#00D18F]/40 text-sm font-medium transition-all text-zinc-900 dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-800"
               />
             </div>

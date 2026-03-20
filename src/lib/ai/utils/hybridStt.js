@@ -44,34 +44,43 @@ async function transcribeWithGroq(audioData) {
 /**
  * Transcribes audio using Gemini 2.0 Flash.
  */
-async function transcribeWithGemini(audioData, mimeType) {
+async function transcribeWithGemini(audioData, mimeType, retryCount = 0) {
   const model = getGemini();
   
-  let base64Data;
-  if (audioData instanceof Buffer) {
-    base64Data = audioData.toString("base64");
-  } else if (typeof audioData.arrayBuffer === 'function') {
-    const arrayBuffer = await audioData.arrayBuffer();
-    base64Data = Buffer.from(arrayBuffer).toString("base64");
-  } else {
-    // Treat as something that can be converted to Buffer
-    base64Data = Buffer.from(audioData).toString("base64");
-  }
-
-  const prompt = "Transcribe the audio accurately. Return ONLY the text, nothing else.";
-  
-  const result = await model.generateContent([
-    prompt,
-    {
-      inlineData: {
-        data: base64Data,
-        mimeType: mimeType
-      }
+  try {
+    let base64Data;
+    if (audioData instanceof Buffer) {
+      base64Data = audioData.toString("base64");
+    } else if (typeof audioData.arrayBuffer === 'function') {
+      const arrayBuffer = await audioData.arrayBuffer();
+      base64Data = Buffer.from(arrayBuffer).toString("base64");
+    } else {
+      base64Data = Buffer.from(audioData).toString("base64");
     }
-  ]);
 
-  const response = await result.response;
-  return response.text().trim();
+    const prompt = "Transcribe the audio accurately. Return ONLY the text.";
+    
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: mimeType
+        }
+      }
+    ]);
+
+    const response = await result.response;
+    return response.text().trim();
+  } catch (err) {
+    // If it's a 429 and we haven't retried too many times
+    if ((err.message.includes("429") || err.message.includes("ResourceExhausted")) && retryCount < 2) {
+      console.warn(`⏳ [STT-HYBRID] Gemini rate limited. Retrying in 2s (Attempt ${retryCount + 1})...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return await transcribeWithGemini(audioData, mimeType, retryCount + 1);
+    }
+    throw err;
+  }
 }
 
 /**

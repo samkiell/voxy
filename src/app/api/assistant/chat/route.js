@@ -25,6 +25,7 @@ export async function POST(req) {
     // 1. Fetch Conversation and Business Context
     const conversationRes = await db.query(
       `SELECT c.*, b.name as business_name, b.category, b.assistant_tone, b.assistant_instructions, b.description as business_desc, b.ai_summary,
+              b.phone, b.state, b.lga, b.street_address,
               u.name as actual_customer_name
        FROM conversations c
        JOIN businesses b ON c.business_id = b.id

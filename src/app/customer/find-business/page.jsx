@@ -86,7 +86,7 @@ export default function FindBusinessPage() {
                         <div className="flex items-center gap-1.5 mt-1">
                           <MapPin size={12} className="text-[#00D18F]" />
                           <span className="text-[10px] text-zinc-500 font-medium truncate">
-                            {business.address || "Global Service"}
+                            {business.state ? `${business.lga ? business.lga + ', ' : ''}${business.state}` : "Global Service"}
                           </span>
                         </div>
                       </div>

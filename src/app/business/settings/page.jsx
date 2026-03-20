@@ -19,7 +19,9 @@ const SETTINGS_FIELDS = [
   'assistant_tone',
   'logo_url',
   'phone',
-  'address'
+  'state',
+  'lga',
+  'street_address'
 ];
 
 export default function BusinessSettingsPage() {
@@ -38,7 +40,9 @@ export default function BusinessSettingsPage() {
     is_live: false,
     logo_url: '',
     phone: '',
-    address: ''
+    state: '',
+    lga: '',
+    street_address: ''
   });
 
   const calculateCompletion = useCallback((data) => {
@@ -55,7 +59,9 @@ export default function BusinessSettingsPage() {
     if (data.assistant_tone && data.assistant_tone.trim().length > 0) completedCount++;
     if (data.logo_url && data.logo_url.trim().length > 0) completedCount++;
     if (data.phone && data.phone.trim().length > 0) completedCount++;
-    if (data.address && data.address.trim().length > 0) completedCount++;
+    if (data.state && data.state.trim().length > 0) completedCount++;
+    if (data.lga && data.lga.trim().length > 0) completedCount++;
+    if (data.street_address && data.street_address.trim().length > 0) completedCount++;
 
     const percentage = Math.round((completedCount / SETTINGS_FIELDS.length) * 100);
     return percentage;

@@ -7,7 +7,9 @@ const ProfileHealth = ({ business }) => {
     { label: 'Description', key: 'description' },
     { label: 'Business type', key: 'category' },
     { label: 'Working hours', key: 'business_hours' },
-    { label: 'Location', key: 'address' },
+    { label: 'State', key: 'state' },
+    { label: 'LGA', key: 'lga' },
+    { label: 'Street Address', key: 'street_address' },
     { label: 'Phone Number', key: 'phone' }
   ];
 
