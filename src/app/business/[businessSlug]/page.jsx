@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Loader2, ChevronLeft, Bot, Info } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import BusinessStorefront from '@/components/business/BusinessStorefront';
 
 export default function BusinessPublicProfilePage({ params }) {
-  const { businessSlug } = params;
+  const resolvedParams = use(params);
+  const { businessSlug } = resolvedParams;
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

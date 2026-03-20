@@ -4,7 +4,8 @@ import { Building2, Activity, DollarSign, Cpu, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function BusinessDetailsPage({ params }) {
-  const business = await getBusinessDetails(params.id);
+  const resolvedParams = await params;
+  const business = await getBusinessDetails(resolvedParams.id);
 
   if (!business) {
     return (

@@ -34,6 +34,10 @@ Text: "${text}"
   try {
     const response = await generateAIResponse(prompt, "Language detector");
     // Sanitize response to get just the word
+    if (!response || !response.text) {
+      console.warn("Language detection failed: AI returned null response.");
+      return "unsupported";
+    }
     const detected = response.text.trim().toLowerCase().split(/\s+/)[0].replace(/[^a-z]/g, "");
     
     const validLanguages = ["english", "yoruba", "hausa", "igbo"];
