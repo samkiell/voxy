@@ -1,186 +1,115 @@
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 
 /**
- * Hybrid Multilingual Text-to-Speech (Serverless-Safe)
+ * PRODUCTION-READY Hybrid Multilingual TTS
  * 
- * Primary: MsEdge Neural Voices
- * Fallback: Direct Google Translate TTS (HTTP, no npm package validation)
- * 
- * Returns base64 Data URIs instead of writing to disk to prevent 
- * Vercel/AWS Lambda read-only filesystem crashes (ENOENT /var/task).
- * 
- * @param {string} text - The input text to convert to speech
- * @param {string} detectedLanguage - english, yoruba, igbo, or hausa
- * @returns {Promise<string>} Base64 audio data URI playable in the browser
+ * 1. ElevenLabs (Native Quality) - Primary for Yoruba/Igbo (Sarah).
+ * 2. Google Translate Direct (Free) - native Hausa/English.
+ * 3. MsEdge Nigerian Neural (Free) - Universal Fallback.
  */
 export async function generateHybridSpeech(text, detectedLanguage = 'english') {
-  if (!text || typeof text !== 'string' || text.trim() === '') {
-    console.error('[HYBRID TTS] Empty input provided, returning null.');
-    return null;
+  if (!text || typeof text !== 'string' || text.trim() === '') return null;
+
+  const lang = (detectedLanguage || 'english').toLowerCase();
+  const elKey = process.env.ELEVENLABS_API_KEY;
+
+  // ─── TIER 1: ElevenLabs (Yoruba & Igbo ONLY) ───
+  // Using Charlie (IKne3meq5aSn9XLyUdCD) for a more authoritative native sound
+  if (elKey && (lang === 'yoruba' || lang === 'igbo')) {
+    try {
+      console.log(`[TTS T1] ElevenLabs: ${lang}`);
+      const audioBuffer = await queryElevenLabs(text, lang, elKey);
+      if (audioBuffer && audioBuffer.length > 2000) {
+         console.log(`[TTS T1] ✅ ElevenLabs Success (${audioBuffer.length}B)`);
+         return `data:audio/mp3;base64,${audioBuffer.toString('base64')}`;
+      }
+    } catch (e) {
+      console.warn(`[TTS T1] ElevenLabs failed:`, e.message);
+    }
   }
 
-  const normalizedLang = detectedLanguage?.toLowerCase() || 'english';
+  // ─── TIER 2: Google Translate Direct (Free - Hausa & English Priority) ───
+  const tier2 = await tryGoogleTranslateDirect(text, lang);
+  if (tier2) return tier2;
 
-  // --- PRIMARY ENGINE: MsEdge Neural Voices ---
-  try {
-    const edgeVoiceMap = {
-      'english': 'en-NG-AbeoNeural',
-      'yoruba':  'yo-NG-OluNeural',
-      'hausa':   'ha-NG-AminaNeural',
-      'igbo':    'ig-NG-NkechiNeural',
-      'unsupported': 'en-US-AriaNeural'
-    };
+  // ─── TIER 3: MsEdge Nigerian Accent (Free Fallback) ───
+  const tier3 = await tryMsEdgeNigerianAccent(text);
+  if (tier3) return tier3;
 
-    let selectedEdgeVoice = edgeVoiceMap[normalizedLang];
-    let edgeText = text;
+  throw new Error('All TTS engines failed to generate audio.');
+}
 
-    if (!selectedEdgeVoice) {
-      console.warn(`[HYBRID TTS: MSEDGE] Fallback active: '${normalizedLang}' is unsupported.`);
-      selectedEdgeVoice = edgeVoiceMap['unsupported'];
-      edgeText = "Language not supported.";
+async function queryElevenLabs(text, lang, apiKey) {
+  // SLOW DOWN TRICK: Add commas after every 3 words to force the AI to pause
+  const slowedText = text.split(' ').map((word, i) => (i > 0 && i % 3 === 0) ? `${word},` : word).join(' ');
+
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL`, 
+    {
+      method: "POST",
+      headers: { "xi-api-key": apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: slowedText,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: { 
+          stability: 1.0, // Maximum stability results in the most deliberate/slowest pace
+          similarity_boost: 0.8,
+          style: 0.0, // Clear and steady
+          use_speaker_boost: true
+        }
+      }),
     }
+  );
 
-    console.log(`[HYBRID TTS] Attempting Primary Engine (MsEdge) using ${selectedEdgeVoice}`);
-    
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const ab = await response.arrayBuffer();
+  return Buffer.from(ab);
+}
+
+// --- Fallback Helpers ---
+
+async function tryGoogleTranslateDirect(text, lang) {
+  const codes = { 'yoruba': 'yo', 'igbo': 'ig', 'hausa': 'ha', 'english': 'en' };
+  const tl = codes[lang] || 'en';
+  
+  // As requested, always using Google for Hausa (since it's free and better)
+  if (tl === 'yo' || tl === 'ig') return null; 
+
+  try {
+    const buffer = await fetchGoogleTTS(text, tl);
+    if (buffer && buffer.length > 2000) return `data:audio/mp3;base64,${buffer.toString('base64')}`;
+    return null;
+  } catch (e) { return null; }
+}
+
+async function tryMsEdgeNigerianAccent(text) {
+  try {
+    const voice = 'en-NG-AbeoNeural';
     const tts = new MsEdgeTTS();
-    await tts.setMetadata(selectedEdgeVoice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-    
-    // Process stream into buffer in memory
-    const stream = tts.toStream(edgeText);
+    await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+    const stream = tts.toStream(text);
     const chunks = [];
-
     await new Promise((resolve, reject) => {
-      stream.audioStream.on('data', chunk => chunks.push(chunk));
-      stream.audioStream.on('end', resolve);
+      const timeout = setTimeout(() => resolve(), 8000);
+      stream.audioStream.on('data', c => chunks.push(c));
+      stream.audioStream.on('end', () => { clearTimeout(timeout); resolve(); });
       stream.audioStream.on('error', reject);
     });
-
-    const audioBuffer = Buffer.concat(chunks);
-    
-    // Validate: MsEdge can silently produce empty/tiny output for some voices
-    if (audioBuffer.length < 1024) {
-      console.warn(`[HYBRID TTS: MSEDGE] Audio buffer too small (${audioBuffer.length} bytes) for voice ${selectedEdgeVoice}. Falling back...`);
-      throw new Error(`MsEdge produced insufficient audio (${audioBuffer.length} bytes)`);
-    }
-
-    console.log(`[HYBRID TTS: MSEDGE] Generated ${audioBuffer.length} bytes of audio`);
-    const base64Audio = audioBuffer.toString('base64');
-    
-    return `data:audio/mp3;base64,${base64Audio}`;
-
-  } catch (primaryError) {
-    console.warn('[HYBRID TTS] Primary Engine (MsEdge) failed. Attempting Fallback...', primaryError.message);
-    
-    // --- FALLBACK ENGINE: Direct Google Translate TTS (HTTP) ---
-    // Bypasses the google-tts-api npm package which rejects yo/ig/ha language codes.
-    // Google Translate itself DOES support Yoruba, Igbo, and Hausa for TTS.
-    try {
-      const gttsLangMap = {
-        'english': 'en',
-        'yoruba':  'yo',
-        'hausa':   'ha',
-        'igbo':    'ig',
-        'unsupported': 'en' 
-      };
-
-      let gttsLang = gttsLangMap[normalizedLang];
-      let gttsText = text;
-
-      if (!gttsLang) {
-        gttsLang = gttsLangMap['unsupported'];
-        gttsText = "Language not supported.";
-      }
-
-      console.log(`[HYBRID TTS] Using Fallback Engine (Google Translate Direct) for '${gttsLang}'`);
-
-      const audioBuffer = await fetchGoogleTranslateTTS(gttsText, gttsLang);
-      
-      if (audioBuffer.length < 1024) {
-        throw new Error(`Google Translate TTS produced insufficient audio (${audioBuffer.length} bytes)`);
-      }
-
-      console.log(`[HYBRID TTS: GOOGLE-DIRECT] Generated ${audioBuffer.length} bytes of audio`);
-      const base64Audio = audioBuffer.toString('base64');
-      return `data:audio/mp3;base64,${base64Audio}`;
-      
-    } catch (fallbackError) {
-      console.error('[HYBRID TTS] Fallback Engine also failed:', fallbackError);
-      throw new Error('All TTS engines failed to generate audio.');
-    }
-  }
+    const buffer = Buffer.concat(chunks);
+    if (buffer && buffer.length > 2000) return `data:audio/mp3;base64,${buffer.toString('base64')}`;
+    return null;
+  } catch (e) { return null; }
 }
 
-/**
- * Fetch TTS audio directly from Google Translate's endpoint.
- * Supports yo, ig, ha, en — no npm package validation blocking.
- * 
- * For long text (>200 chars), splits into chunks and concatenates audio.
- * 
- * @param {string} text - Text to synthesize
- * @param {string} lang - BCP-47 language code (yo, ig, ha, en)
- * @returns {Promise<Buffer>} MP3 audio buffer
- */
-async function fetchGoogleTranslateTTS(text, lang) {
-  const MAX_CHUNK_LENGTH = 200;
-  const textChunks = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
-  const audioBuffers = [];
-
-  for (const chunk of textChunks) {
-    const encodedText = encodeURIComponent(chunk);
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodedText}&textlen=${chunk.length}&ttsspeed=1`;
-
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://translate.google.com/',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Google Translate TTS returned ${response.status} for lang '${lang}'`);
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-    audioBuffers.push(Buffer.from(arrayBuffer));
+async function fetchGoogleTTS(text, lang) {
+  const chunks = text.length > 200 ? text.match(/.{1,200}/g) : [text];
+  const buffers = [];
+  for (const chunk of chunks) {
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=gtx&q=${encodeURIComponent(chunk)}`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const ab = await res.arrayBuffer();
+    buffers.push(Buffer.from(ab));
   }
-
-  return Buffer.concat(audioBuffers);
-}
-
-/**
- * Split text into chunks at sentence/word boundaries.
- * Google Translate TTS has a ~200 character limit per request.
- */
-function splitTextIntoChunks(text, maxLength) {
-  if (text.length <= maxLength) return [text];
-
-  const chunks = [];
-  let remaining = text;
-
-  while (remaining.length > 0) {
-    if (remaining.length <= maxLength) {
-      chunks.push(remaining);
-      break;
-    }
-
-    // Try to split at sentence boundary first
-    let splitIdx = remaining.lastIndexOf('. ', maxLength);
-    if (splitIdx === -1 || splitIdx < maxLength * 0.3) {
-      // Try comma
-      splitIdx = remaining.lastIndexOf(', ', maxLength);
-    }
-    if (splitIdx === -1 || splitIdx < maxLength * 0.3) {
-      // Try space
-      splitIdx = remaining.lastIndexOf(' ', maxLength);
-    }
-    if (splitIdx === -1 || splitIdx < maxLength * 0.3) {
-      // Hard split
-      splitIdx = maxLength;
-    }
-
-    chunks.push(remaining.slice(0, splitIdx + 1).trim());
-    remaining = remaining.slice(splitIdx + 1).trim();
-  }
-
-  return chunks.filter(c => c.length > 0);
+  return Buffer.concat(buffers);
 }
