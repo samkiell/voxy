@@ -28,23 +28,16 @@ export default function FinancePage() {
       const res = await fetch('/api/admin/metrics');
       const data = await res.json();
       if (data.success) {
-        // Mocking some financial logic for calculation based on the requested formula:
-        // profit = credits_value - infra_cost
-        // Assuming 1 credit = $0.05 for this simulation
-        const CREDIT_VALUE = 0.05;
-        
-        const bData = data.topBusinesses.map(b => ({
+        setBusinesses(data.topBusinesses.map(b => ({
           ...b,
-          creditsRevenue: b.cost / 0.7 * CREDIT_VALUE, // Theoretical revenue
+          creditsRevenue: b.revenue,
           actualCost: b.cost,
-          profit: (b.cost / 0.7 * CREDIT_VALUE) - b.cost
-        }));
-
-        setBusinesses(bData);
+          profit: b.profit
+        })));
         setStats({
-          totalRevenue: bData.reduce((s, b) => s + b.creditsRevenue, 0),
-          totalCost: bData.reduce((s, b) => s + b.actualCost, 0),
-          totalProfit: bData.reduce((s, b) => s + b.profit, 0),
+          totalRevenue: data.totalRevenue,
+          totalCost: data.totalCost,
+          totalProfit: data.totalProfit,
         });
       }
     } catch (e) {

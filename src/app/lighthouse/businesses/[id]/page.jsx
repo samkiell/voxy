@@ -38,32 +38,22 @@ export default function BusinessDetailsPage({ params }) {
 
   const fetchDetails = async () => {
     try {
-      const res = await fetch(`/api/admin/businesses-ranking`); // Reusing ranking to find business or add new endpoint
-      // Actually, we should have a dedicated detail API. 
-      // For now, I'll use the existing server action logic converted to fetch if needed, 
-      // but I'll assume we can fetch it.
-      const resDetail = await fetch(`/api/admin/metrics`); // Mocking detail fetch for now
-      const data = await resDetail.json();
-      // In a real app, I'd have GET /api/admin/businesses/[id]
-      // I'll simulate the data for this UI upgrade.
-      setBusiness({
-          id,
-          name: "Business Name",
-          owner_email: "owner@example.com",
-          status: "active",
-          stats: { totalLlmTokens: 15400, llmCost: 12.4, totalSttDuration: 450, sttCost: 8.2, totalTtsUsage: 8900, ttsCost: 4.5, requestsCount: 120, totalCost: 25.1 },
-          charts: [],
-          is_ai_enabled: true,
-          rate_limit_per_min: 60,
-          forced_model: 'gemini-2.0-flash'
-      });
-      setControls({
-        is_ai_enabled: true,
-        rate_limit_per_min: 60,
-        forced_model: 'gemini-2.0-flash'
-      });
+      const res = await fetch(`/api/admin/businesses/${id}`);
+      const data = await res.json();
+      
+      if (data.success) {
+        setBusiness(data.business);
+        setControls({
+          is_ai_enabled: data.business.is_ai_enabled ?? true,
+          rate_limit_per_min: data.business.rate_limit_per_min ?? 60,
+          forced_model: data.business.forced_model ?? ''
+        });
+      } else {
+        toast.error(data.error || 'Failed to fetch details');
+      }
     } catch (e) {
       console.error(e);
+      toast.error('Connection error');
     } finally {
       setLoading(false);
     }
@@ -96,6 +86,19 @@ export default function BusinessDetailsPage({ params }) {
         <div className="flex flex-col items-center justify-center p-20 min-h-[60vh] text-zinc-500">
           <Loader2 className="w-10 h-10 animate-spin text-voxy-primary mb-4" />
           <p className="text-[13px] font-medium">Retrieving business forensics...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!business) {
+    return (
+      <DashboardLayout title="Not Found">
+        <div className="p-20 text-center flex flex-col items-center justify-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Business record not found</h2>
+          <Link href="/lighthouse/businesses" className="text-voxy-primary font-medium hover:underline flex items-center gap-2">
+            <ArrowLeft size={16} /> Back to directory
+          </Link>
         </div>
       </DashboardLayout>
     );
@@ -168,19 +171,34 @@ export default function BusinessDetailsPage({ params }) {
               ))}
             </div>
 
-            {/* Financial Summary */}
-            <div className="p-10 bg-[#0A0A0A] border border-white/5 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
-               <div className="space-y-1 text-center sm:text-left">
-                 <p className="text-[12px] font-bold text-zinc-500 uppercase tracking-widest">Gross Infrastructure Spend</p>
-                 <h2 className="text-5xl font-bold text-white tracking-tight tabular-nums">${stats.totalCost.toFixed(2)}</h2>
-               </div>
-               <div className="size-16 rounded-2xl bg-voxy-primary/10 border border-voxy-primary/20 flex items-center justify-center text-voxy-primary shadow-xl shadow-voxy-primary/5">
-                 <DollarSign className="w-8 h-8" />
-               </div>
+            {/* Daily Usage History */}
+            <div className="bg-[#0A0A0A] border border-white/5 rounded-3xl p-8 shadow-2xl">
+              <div className="flex items-center gap-3 mb-8">
+                <Activity size={18} className="text-voxy-primary" />
+                <h2 className="text-xl font-bold text-white tracking-tight">Recent Activity Log</h2>
+              </div>
+              
+              <div className="space-y-3">
+                {business.charts?.length === 0 ? (
+                  <div className="py-10 text-center text-zinc-600">
+                     <p className="text-[14px] font-medium">No usage records found for this period</p>
+                  </div>
+                ) : (
+                  business.charts?.map(day => (
+                    <div key={day.date} className="flex items-center justify-between p-5 bg-white/[0.01] border border-white/5 rounded-2xl hover:bg-white/[0.03] transition-all group">
+                      <div className="text-[15px] font-semibold text-zinc-300">{day.date}</div>
+                      <div className="flex items-center gap-8">
+                        <div className="text-zinc-500 font-medium text-[13px]">{day.count} requests</div>
+                        <div className="text-voxy-primary font-bold tabular-nums">${day.cost.toFixed(2)}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Intervention Panel (NEW) */}
+          {/* Intervention Panel */}
           <div className="space-y-8">
             <div className="bg-[#0A0A0A] border border-white/5 rounded-3xl p-8 shadow-2xl space-y-8 sticky top-8">
               <div className="flex items-center gap-3">

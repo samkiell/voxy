@@ -98,7 +98,7 @@ export default function LighthouseOverviewPage() {
     },
     { 
       title: 'Monthly Consumption', 
-      value: `$${stats.totalCost.toFixed(2)}`, 
+      value: stats.totalCost ? `$${stats.totalCost.toFixed(2)}` : '$0.00', 
       description: 'Aggregate provider cost',
       icon: DollarSign, 
       colorClass: 'text-emerald-400'

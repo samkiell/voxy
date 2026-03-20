@@ -42,10 +42,15 @@ export async function getSystemHealth() {
     `);
     const errorCount = parseInt(errorRes.rows[0]?.count || 0);
 
+    // 4. Platform Credits (Total Liquidity)
+    const creditsRes = await db.query('SELECT SUM(credit_balance) as total FROM businesses');
+    const totalCredits = parseFloat(creditsRes.rows[0]?.total || 0);
+
     return {
       latencies,
       alertStats,
       errorCount,
+      totalCredits,
       status: alertStats.critical > 0 ? 'critical' : (alertStats.high > 0 ? 'warning' : 'stable'),
       timestamp: new Date().toISOString()
     };
