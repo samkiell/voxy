@@ -8,10 +8,10 @@ export const siteConfig = {
   shortName: "Voxy",
   description: "Advanced AI-powered business chat platform for seamless customer engagement and conversion.",
   url: "https://voxy.samkiel.dev",
-  ogImage: "https://voxy.samkiel.dev/og-image.png",
+  ogImage: "https://voxy.samkiel.dev/favicon.jpg",
   links: {
     twitter: "@voxy_ai",
-    github: "https://github.com/voxy-ai",
+    github: "https://github.com/ifemafia/voxy",
   },
   keywords: [
     "AI Business Chat",
