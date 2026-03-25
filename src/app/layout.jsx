@@ -1,6 +1,8 @@
 import { Inter, DM_Serif_Display } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,6 +29,8 @@ export default function RootLayout({ children }) {
       <body className={`${inter.variable} ${dmSerif.variable} antialiased`}>
         <ThemeProvider>
           {children}
+          <Analytics />
+          <SpeedInsights />
           <Toaster 
             position="top-center"
             toastOptions={{

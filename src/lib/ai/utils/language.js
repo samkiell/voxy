@@ -8,11 +8,9 @@ import { generateAIResponse } from "../core/generateAIResponse.js";
 export async function detectLanguageGemini(text) {
   if (!text || text.trim().length === 0) return "english"; // Default to English for empty/whitespace
 
-  const trimmedLower = text.trim().toLowerCase();
-  
-  // Quick check for common short English greetings to save tokens/latency
-  const commonEnglishGreetings = ['hi', 'hello', 'hey', 'yo', 'good morning', 'good afternoon', 'good evening'];
-  if (commonEnglishGreetings.includes(trimmedLower)) return "english";
+  // High-speed English heuristic (Skips the LLM call for standard English patterns)
+  const englishRegex = /^[a-z0-9\s.,!?'"()\-]+$/i;
+  if (text.length > 5 && englishRegex.test(text)) return "english";
 
   const prompt = `
 Detect the language of the following text. 
