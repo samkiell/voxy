@@ -1,4 +1,4 @@
-import db from '@/lib/db';
+import db from '../../lib/db.js';
 
 /**
  * Detects usage anomalies by comparing recent usage against historical averages.
@@ -26,7 +26,7 @@ export async function detectUsageAnomaly(businessId, type, currentCost) {
       SELECT SUM(cost_estimate) as recent_cost
       FROM usage_logs
       WHERE business_id = $1
-      AND type = $3
+      AND type = $2
       AND created_at >= NOW() - INTERVAL '1 hour'
     `;
     const recentRes = await db.query(recentQuery, [businessId, type]);

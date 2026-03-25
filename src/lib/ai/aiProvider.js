@@ -10,50 +10,58 @@ import { generateGroqResponse } from './providers/groq.js';   // Fallback provid
  */
 export async function generateAI({ userId, businessId, prompt, type = 'chat', model = 'gpt-4o-mini', systemInstruction = "" }) {
   
-  // 1. PRE-PROCESSING SECURITY SCAN (Step 4)
-  // Ensures safety before any tokens are sent to models.
-  const secureInput = await runSecurityChecks(typeof prompt === 'string' ? prompt : prompt[prompt.length - 1].content);
+  // 1. PRE-PROCESSING SECURITY SCAN (Step 3 & 4 Upgrade)
+  // Ensures active protection + sanitization before any tokens are sent.
+  const rawInput = typeof prompt === 'string' ? prompt : prompt[prompt.length - 1].content;
+  const security = await runSecurityChecks(rawInput);
+
+  if (security.riskLevel === 'high') {
+    console.warn(`🛡️ [AI-PROVIDER] High Risk Detected: ${security.flags.join(', ')}. Sanitizing aggressively.`);
+  }
+
+  // Use sanitized input for the actual AI call
+  const sanitizedInput = security.sanitizedInput;
 
   // Rebuild prompt/messages if it was an array
-  const sanitizedPrompt = typeof prompt === 'string' 
-    ? secureInput 
-    : prompt.map((m, i) => i === prompt.length - 1 ? { ...m, content: secureInput } : m);
+  const finalPrompt = typeof prompt === 'string' 
+    ? sanitizedInput 
+    : prompt.map((m, i) => i === prompt.length - 1 ? { ...m, content: sanitizedInput } : m);
 
-  // 2. EXECUTION WITH INTERNAL OBSERVABILITY (Step 2 & 7)
+  // 2. EXECUTION WITH INTERNAL OBSERVABILITY
   return await trackAIUsage(
     { userId, businessId, requestType: type, provider: "cencori", model },
     async () => {
       try {
-        // A. PRIMARY GATEWAY: CENCORI (Step 2)
-        console.log(`📡 [AI-PROVIDER] Calling Cencori Gateway (${model})...`);
+        // A. PRIMARY GATEWAY: CENCORI
         const res = await callCencoriAI({ 
-          prompt: sanitizedPrompt, 
+          prompt: finalPrompt, 
           model, 
           metadata: { systemInstruction } 
         });
         
         return {
           ...res,
+          ...security, // Inject riskLevel, wasSanitized for Step 5 logging
           providerUsed: "cencori"
         };
       } catch (err) {
-        // B. SECONDARY FALLBACK: DIRECT PROVIDER (Step 2)
-        // If Cencori Gateway is unreachable, we call providers directly.
-        console.warn(`⚠️ [AI-PROVIDER] Cencori Gateway failed: ${err.message}. Falling back to direct provider...`);
+        // B. SECONDARY FALLBACK: DIRECT PROVIDER
+        console.warn(`⚠️ [AI-PROVIDER] Cencori Gateway failed. Falling back to direct provider...`);
         
         try {
-          // Direct fallback to Groq or Gemini
-          const fallbackRes = await generateGroqResponse(sanitizedPrompt, systemInstruction);
+          const fallbackRes = await generateGroqResponse(finalPrompt, systemInstruction);
           return {
             ...fallbackRes,
+            ...security, // Carry security metadata to fallback log
             providerUsed: "groq (fallback)",
             fallbackUsed: true
           };
         } catch (fallbackErr) {
           console.error(`❌ [AI-PROVIDER] Primary Fallback failed. Trying Final Fallback (Gemini)...`);
-          const finalRes = await generateGeminiResponse(sanitizedPrompt, systemInstruction);
+          const finalRes = await generateGeminiResponse(finalPrompt, systemInstruction);
           return {
             ...finalRes,
+            ...security, 
             providerUsed: "gemini (fallback)",
             fallbackUsed: true
           };

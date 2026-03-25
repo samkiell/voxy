@@ -74,10 +74,14 @@ export async function trackAIUsage({ userId, businessId, requestType, provider, 
     const latency = Date.now() - startTime;
     
     // Step 7: Logging dynamic metadata (providerUsed, model)
-    // Extract actual provider used from result if fallback occurred
+    // Extract actual provider used and security metrics
     const actualProvider = (result && result.providerUsed) || provider;
     const actualModel = (result && result.model) || model;
     const actualTokens = (result && result.tokensUsed) || 0;
+    
+    // Step 5: Log Security Events
+    const riskLevel = (result && result.riskLevel) || 'low';
+    const wasSanitized = (result && result.wasSanitized) || false;
 
     const cost = estimateCost({ 
       provider: actualProvider, 
@@ -91,8 +95,8 @@ export async function trackAIUsage({ userId, businessId, requestType, provider, 
       INSERT INTO ai_usage_logs (
         user_id, business_id, request_type, provider, model, 
         input_size, output_size, latency, estimated_cost, 
-        status, error_message
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        status, error_message, risk_level, was_sanitized
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     `, [
       userId || null, 
       businessId || null, 
@@ -104,7 +108,9 @@ export async function trackAIUsage({ userId, businessId, requestType, provider, 
       latency, 
       cost, 
       status, 
-      errorMessage
+      errorMessage,
+      riskLevel,
+      wasSanitized
     ]).catch(dbError => {
       console.error('[AI-Observability] Failed to save usage log:', dbError.message);
     });
