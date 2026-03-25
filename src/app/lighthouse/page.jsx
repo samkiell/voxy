@@ -179,7 +179,7 @@ export default function LighthouseOverviewPage() {
               />
               <AdminStatCard 
                 title="Model Spend" 
-                value={`₦${Number(aiMetrics?.totalCost || 0).toFixed(4)}`} 
+                value={`₦${Number(aiMetrics?.totalCost || 0).toFixed(2)}`} 
                 description="Estimated provider costs"
                 icon={DollarSign}
                 colorClass="text-emerald-500"
@@ -297,7 +297,7 @@ export default function LighthouseOverviewPage() {
                            </div>
                          </div>
                          <div className="text-right">
-                           <div className="text-xl font-bold text-white tracking-tight tabular-nums">₦${Number(b.cost).toFixed(2)}</div>
+                           <div className="text-xl font-bold text-white tracking-tight tabular-nums">₦{Number(b.cost).toFixed(2)}</div>
                            <p className="text-[11px] font-bold text-zinc-500 mt-1 uppercase">Monthly Spend</p>
                          </div>
                        </div>
@@ -335,7 +335,7 @@ export default function LighthouseOverviewPage() {
                                 <span className={`text-[10px] font-bold uppercase tracking-widest ${log.type === 'llm' ? 'text-blue-400' : 'text-purple-400'}`}>
                                   {log.type}
                                 </span>
-                                <span className="text-zinc-600 text-[10px] tabular-nums">₦{Number(log.cost_estimate).toFixed(4)}</span>
+                                <span className="text-zinc-600 text-[10px] tabular-nums">₦{Number(log.cost_estimate).toFixed(2)}</span>
                               </div>
                            </div>
                         </div>

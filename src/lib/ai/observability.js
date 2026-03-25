@@ -89,7 +89,7 @@ export async function trackAIUsage({ userId, businessId, requestType, provider, 
     db.query(`
       INSERT INTO ai_usage_logs (
         user_id, business_id, request_type, provider, model, 
-        input_size, output_size, latency, estimated_cost, 
+        input_size, output_size, latency, cost_estimate, 
         status, error_message, risk_level, was_sanitized
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     `, [

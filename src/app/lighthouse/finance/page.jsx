@@ -75,21 +75,21 @@ export default function FinancePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-3xl space-y-4">
              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">Total Estimated Revenue</div>
-             <p className="text-4xl font-bold text-white tabular-nums">${stats.totalRevenue.toFixed(2)}</p>
+             <p className="text-4xl font-bold text-white tabular-nums">₦{stats.totalRevenue.toFixed(2)}</p>
              <div className="flex items-center gap-2 text-[13px] text-emerald-500 font-bold">
                <TrendingUp size={14} /> +12.4% from last period
              </div>
           </div>
           <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-3xl space-y-4">
              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">Gross Infrastructure Cost</div>
-             <p className="text-4xl font-bold text-white tabular-nums">${stats.totalCost.toFixed(2)}</p>
+             <p className="text-4xl font-bold text-white tabular-nums">₦{stats.totalCost.toFixed(2)}</p>
              <div className="flex items-center gap-2 text-[13px] text-orange-500 font-bold">
                <TrendingDown size={14} /> -3.2% optimization saving
              </div>
           </div>
           <div className="bg-[#0A0A0A] border border-white/5 p-8 rounded-3xl space-y-4 ring-1 ring-emerald-500/20">
              <div className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest text-emerald-500">Net Platform Profit</div>
-             <p className="text-4xl font-bold text-white tabular-nums">${stats.totalProfit.toFixed(2)}</p>
+             <p className="text-4xl font-bold text-white tabular-nums">₦{stats.totalProfit.toFixed(2)}</p>
              <div className="flex items-center gap-2 text-[13px] text-zinc-500 font-medium">
                 Margin: <span className="text-emerald-500 font-bold">{(stats.totalProfit / stats.totalRevenue * 100).toFixed(1)}%</span>
              </div>
@@ -118,15 +118,15 @@ export default function FinancePage() {
                    <div className="grid grid-cols-3 gap-16 text-right">
                       <div>
                         <p className="text-[10px] font-bold text-zinc-600 uppercase">Rev</p>
-                        <p className="text-sm font-bold text-white tabular-nums">${b.creditsRevenue.toFixed(2)}</p>
+                        <p className="text-sm font-bold text-white tabular-nums">₦{b.creditsRevenue.toFixed(2)}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-zinc-600 uppercase">Cost</p>
-                        <p className="text-sm font-bold text-zinc-400 tabular-nums">${b.actualCost.toFixed(2)}</p>
+                        <p className="text-sm font-bold text-zinc-400 tabular-nums">₦{b.actualCost.toFixed(2)}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-emerald-500 uppercase">Profit</p>
-                        <p className="text-sm font-bold text-emerald-500 tabular-nums">${b.profit.toFixed(2)}</p>
+                        <p className="text-sm font-bold text-emerald-500 tabular-nums">₦{b.profit.toFixed(2)}</p>
                       </div>
                    </div>
                 </div>
