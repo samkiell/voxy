@@ -44,7 +44,7 @@ export default async function BusinessesListPage() {
                 <tr className="border-b border-white/[0.03] bg-white/[0.01]">
                   <th className="py-5 px-8 text-zinc-500 text-[11px] font-semibold uppercase tracking-wider">Business Name</th>
                   <th className="py-5 px-6 text-zinc-500 text-[11px] font-semibold uppercase tracking-wider">Owner Email</th>
-                  <th className="py-5 px-6 text-zinc-500 text-[11px] font-semibold uppercase tracking-wider text-center">Credit Balance</th>
+                  <th className="py-5 px-6 text-zinc-500 text-[11px] font-semibold uppercase tracking-wider text-center">VP Balance</th>
                   <th className="py-5 px-6 text-zinc-500 text-[11px] font-semibold uppercase tracking-wider text-center">Total Purchased</th>
                   <th className="py-5 px-6 text-zinc-500 text-[11px] font-semibold uppercase tracking-wider text-center">Total Used</th>
                   <th className="py-5 px-6 text-zinc-500 text-[11px] font-semibold uppercase tracking-wider text-right">Actions</th>

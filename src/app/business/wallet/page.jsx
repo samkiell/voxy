@@ -16,7 +16,7 @@ import {
 import { toast } from 'react-hot-toast';
 
 /**
- * WalletPage - Manages business credits and transaction history
+ * WalletPage - Manages business Voxy Points (VP) and transaction history
  */
 export default function WalletPage() {
   const { user } = useAuth();
@@ -53,7 +53,7 @@ export default function WalletPage() {
   // Handle Paystack purchase initialization
   const handlePurchase = async () => {
     if (purchaseAmount < 10) {
-      toast.error('Minimum purchase is 10 credits');
+      toast.error('Minimum purchase is 10 VP');
       return;
     }
     
@@ -96,8 +96,8 @@ export default function WalletPage() {
         
         {/* Header Section */}
         <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-top-4 duration-500">
-           <h1 className="text-2xl font-bold tracking-tight">Money & credits</h1>
-           <p className="text-zinc-500 text-sm">Check your credits and see how you used them.</p>
+           <h1 className="text-2xl font-bold tracking-tight">Money & VP</h1>
+           <p className="text-zinc-500 text-sm">Check your Voxy Points and see how you used them.</p>
         </div>
 
         {/* Actionable Warning: Low Balance */}
@@ -107,7 +107,7 @@ export default function WalletPage() {
                <AlertCircle className="text-orange-500 w-5 h-5" />
              </div>
              <div className="flex-1">
-               <p className="text-zinc-900 dark:text-zinc-100 text-sm font-semibold">Low credit balance</p>
+               <p className="text-zinc-900 dark:text-zinc-100 text-sm font-semibold">Low VP balance</p>
                <p className="text-zinc-500 text-xs">Your AI responses will stop functioning when balance reaches 0. Re-up now to avoid service interruption.</p>
              </div>
              <button 
@@ -130,14 +130,14 @@ export default function WalletPage() {
                <div className="absolute top-0 right-0 -mt-4 -mr-4 p-8 opacity-[0.02] dark:opacity-[0.05] rotate-12">
                   <Wallet size={160} />
                </div>
-               <p className="text-zinc-500 text-[11px] font-semibold mb-2">Available credits</p>
+               <p className="text-zinc-500 text-[11px] font-semibold mb-2">Available Voxy Points (VP)</p>
                <div className="flex items-baseline gap-3">
                  <span className="text-6xl font-black text-zinc-900 dark:text-white">{balance}</span>
                  <span className="text-zinc-400 font-medium">units</span>
                </div>
                 <div className="mt-8 flex items-center gap-2 text-zinc-500 text-[11px] bg-zinc-50 dark:bg-white/[0.03] rounded-lg p-3">
                    <AlertCircle size={14} className="text-voxy-primary" />
-                   <span>1 Credit = 1 native AI response</span>
+                   <span>1 VP = 1 native AI response</span>
                 </div>
             </div>
 
@@ -149,7 +149,7 @@ export default function WalletPage() {
               </h3>
               <div className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-[11px] font-semibold text-zinc-500 ml-1">Credits to add</label>
+                   <label className="text-[11px] font-semibold text-zinc-500 ml-1">Points to add (VP)</label>
                    <div className="relative">
                       <input 
                         id="buy-input"
@@ -160,7 +160,7 @@ export default function WalletPage() {
                         placeholder="0"
                       />
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 font-bold pointer-events-none">
-                        CR
+                        VP
                       </div>
                    </div>
                 </div>
@@ -188,12 +188,12 @@ export default function WalletPage() {
                     ) : (
                       <>
                         <CreditCard className="w-5 h-5" />
-                        <span>Buy credits</span>
+                        <span>Buy Voxy Points</span>
                       </>
                     )}
                   </button>
                   <p className="text-[10px] text-center text-zinc-400 mt-4 leading-relaxed px-4">
-                    Credits never expire. Payments are for testing only.
+                    Points never expire. Payments are for testing only.
                   </p>
                 </div>
               </div>
@@ -209,7 +209,7 @@ export default function WalletPage() {
                     <History className="w-6 h-6 text-voxy-primary" />
                     Activity
                   </h3>
-                  <p className="text-[11px] font-medium text-zinc-500 mt-1">Details of your credit use and payments.</p>
+                  <p className="text-[11px] font-medium text-zinc-500 mt-1">Details of your VP use and payments.</p>
                 </div>
               </div>
 

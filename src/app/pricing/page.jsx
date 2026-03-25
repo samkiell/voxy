@@ -18,7 +18,7 @@ const plans = [
     price: "₦1,000",
     perCredit: "₦10.00",
     features: [
-      "100 AI Credits",
+      "100 Voxy Points (VP)",
       "Native Accent Understanding",
       "AI Drafted Replies",
       "Basic Analytics",
@@ -37,7 +37,7 @@ const plans = [
     perCredit: "₦9.00",
     discount: "10% OFF",
     features: [
-      "500 AI Credits",
+      "500 Voxy Points (VP)",
       "High Priority Queue",
       "Advanced Intent Detection",
       "Team Management (Up to 3)",
@@ -56,7 +56,7 @@ const plans = [
     perCredit: "₦8.00",
     discount: "20% OFF",
     features: [
-      "1,000 AI Credits",
+      "1,000 Voxy Points (VP)",
       "Unlimited Team Seats",
       "Custom AI Instructions",
       "Full API Access",
@@ -93,7 +93,7 @@ export default function PricingPage() {
                Pay for what you <span className="text-voxy-primary">actually use.</span>
              </h1>
              <p className="text-voxy-muted text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-               No monthly subscriptions or hidden fees. Just simple, pay-as-you-go credits that never expire. Choose a bundle that fits your business volume.
+               No monthly subscriptions or hidden fees. Just simple, pay-as-you-go Voxy Points (VP) that never expire. Choose a bundle that fits your business volume.
              </p>
           </div>
 
@@ -135,7 +135,7 @@ export default function PricingPage() {
                       <span className="text-5xl font-black tracking-tighter text-zinc-900 dark:text-white transition-colors">{plan.price}</span>
                    </div>
                    <p className="text-voxy-muted text-sm font-medium mt-2">
-                     <span className="text-voxy-text font-black">{plan.credits} Credits</span> — Approximately {plan.perCredit} per response
+                     <span className="text-voxy-text font-black">{plan.credits} VP</span> — Approximately {plan.perCredit} per response
                    </p>
                 </div>
 
@@ -176,12 +176,12 @@ export default function PricingPage() {
           {/* FAQ / Trust Section */}
           <div className="pt-10 grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
              <div className="space-y-3 p-8 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-3xl border border-zinc-100 dark:border-white/5">
-                <h4 className="font-black text-xl tracking-tight">Do credits expire?</h4>
-                <p className="text-sm text-voxy-muted leading-relaxed">Never. Your credits stay in your account forever. Whether you use them today or next year, they're always ready when your customers reach out. We believe you should only pay for value delivered.</p>
+                <h4 className="font-black text-xl tracking-tight">Do Voxy Points expire?</h4>
+                <p className="text-sm text-voxy-muted leading-relaxed">Never. Your Voxy Points (VP) stay in your account forever. Whether you use them today or next year, they're always ready when your customers reach out. We believe you should only pay for value delivered.</p>
              </div>
              <div className="space-y-3 p-8 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-3xl border border-zinc-100 dark:border-white/5">
                 <h4 className="font-black text-xl tracking-tight">Can I switch plans?</h4>
-                <p className="text-sm text-voxy-muted leading-relaxed">Since we follow a credit-based model, there are no "plans" to switch. You can purchase larger bundles whenever you need them to take advantage of the per-credit discounts as your volume grows.</p>
+                <p className="text-sm text-voxy-muted leading-relaxed">Since we follow a point-based model (VP), there are no "plans" to switch. You can purchase larger bundles whenever you need them to take advantage of the per-point discounts as your volume grows.</p>
              </div>
           </div>
 

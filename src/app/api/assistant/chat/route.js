@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { generateAIResponse } from "@/lib/ai/core/generateAIResponse";
 import { 
   buildBusinessSummary, 
   shouldIncludeBusinessContext, 
@@ -9,11 +8,9 @@ import {
   detectIntent
 } from '@/lib/ai-context';
 import { notifyBusiness } from '@/lib/notifications';
-import { detectLanguageGemini, validateResponseLanguage } from '@/lib/ai/utils/language';
-import { trackUsage } from '@/lib/tracking';
-import { trackAIUsage } from '@/lib/ai/observability';
-import { getFallbackResponse, validateAIResponse } from '@/lib/ai/utils/fallback';
-import { deductCredit, CREDIT_ERRORS } from '@/lib/services/credit-service';
+import { detectLanguageGemini } from '@/lib/ai/utils/language';
+import { generateAI } from "@/lib/ai/aiProvider";
+import { deductCredit } from '@/lib/services/credit-service';
 
 export async function POST(req) {
   try {

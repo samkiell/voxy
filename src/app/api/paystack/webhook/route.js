@@ -36,7 +36,7 @@ export async function POST(req) {
         return NextResponse.json({ error: 'Missing metadata' }, { status: 400 });
       }
 
-      console.log(`💰 [Paystack Webhook] Processing payment of ${creditAmount} CR for Business: ${businessId}`);
+      console.log(`💰 [Paystack Webhook] Processing payment of ${creditAmount} VP for Business: ${businessId}`);
 
       // 4. Update Business Wallet (Atomic + Idempotent)
       // We use the Paystack transaction reference to prevent duplicate crediting

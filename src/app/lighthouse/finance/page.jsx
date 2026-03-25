@@ -69,7 +69,7 @@ export default function FinancePage() {
               Net Positive
             </Badge>
           </h1>
-          <p className="text-[15px] text-zinc-500">Analysis of credit sales value vs underlying infrastructure costs.</p>
+          <p className="text-[15px] text-zinc-500">Analysis of VP sales value vs underlying infrastructure costs.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

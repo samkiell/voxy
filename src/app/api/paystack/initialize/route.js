@@ -4,11 +4,11 @@ import { getUserFromCookie } from '@/lib/auth';
 import db from '@/lib/db';
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
-const CREDIT_PRICE_NGN = 10; // 1 Credit = 10 NGN
+const CREDIT_PRICE_NGN = 10; // 1 VP = 10 NGN
 
 /**
  * POST: Initialize Paystack Transaction
- * Body: { amount: number } (number of credits)
+ * Body: { amount: number } (number of VP)
  */
 export async function POST(req) {
   try {
@@ -19,7 +19,7 @@ export async function POST(req) {
 
     const { amount } = await req.json();
     if (!amount || amount < 10) {
-      return NextResponse.json({ error: 'Minimum purchase is 10 credits' }, { status: 400 });
+      return NextResponse.json({ error: 'Minimum purchase is 10 VP' }, { status: 400 });
     }
 
     // 1. Get business ID
