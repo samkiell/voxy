@@ -78,7 +78,7 @@ export default function DashboardLayout({ children, title }) {
                    <div className="flex flex-col">
                       <span className="text-[10px] text-zinc-600 font-bold uppercase">Voxy Points</span>
                       <span className="text-[12px] font-bold text-voxy-primary tabular-nums">
-                         ₦{summary.credits.toLocaleString()}
+                       {summary.credits.toLocaleString()} VP
                       </span>
                    </div>
                 </div>

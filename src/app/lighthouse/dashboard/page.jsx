@@ -136,7 +136,7 @@ export default function AdminDashboardPage() {
           />
           <AdminStatCard 
             title="AI Token Load" 
-            value={`${(aiMetrics?.total_tokens / 1000).toFixed(0)}k`} 
+            value={`${(Number(aiMetrics?.total_tokens || 0) / 1000).toFixed(0)}k`} 
             trend={`${aiMetrics?.error_rate || 0}% errors`} 
             positive={false} 
             icon={Cpu} 
