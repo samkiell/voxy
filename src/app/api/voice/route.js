@@ -8,6 +8,7 @@ import { generateHybridSpeech } from '@/lib/ai/utils/hybridTts';
 import { detectLanguageGemini } from '@/lib/ai/utils/language';
 import { trackUsage } from '@/lib/tracking';
 import { transcribeAudioHybrid } from '@/lib/ai/utils/hybridStt';
+import { trackAIUsage } from '@/lib/ai/observability';
 import { getBaseUrl } from '@/lib/utils';
 
 // Import the existing chat handler to prevent logic duplication
@@ -69,7 +70,13 @@ export async function POST(req) {
 
     // 1. Convert Audio to Text (using Groq Whisper)
     const sttStartTime = Date.now();
-    const transcript = await transcribeAudio(audioBlob);
+    const transcript = await trackAIUsage({
+      userId: role === 'owner' ? null : null, // Not easily available here, maybe just business level
+      businessId,
+      requestType: 'voice',
+      provider: 'groq',
+      model: 'whisper-large-v3'
+    }, async () => await transcribeAudio(audioBlob));
     const sttDurationSeconds = Math.round((Date.now() - sttStartTime) / 1000) || 1;
     
     if (businessId) {
@@ -94,7 +101,13 @@ export async function POST(req) {
     // ONLY generate AI response if it's a CUSTOMER speaking
     if (role !== 'owner') {
       // 2a. Detect Language early for voice flow early rejection
-      detectedLanguage = await detectLanguageGemini(transcript);
+      detectedLanguage = await trackAIUsage({
+        userId: null,
+        businessId,
+        requestType: 'system',
+        provider: 'gemini',
+        model: 'language-detector'
+      }, async () => await detectLanguageGemini(transcript));
       console.log(`[VOICE] Detected Language: ${detectedLanguage}`);
 
       if (detectedLanguage === 'unsupported') {
@@ -129,7 +142,13 @@ export async function POST(req) {
     if (aiResponseText) {
       const ttsStartTime = Date.now();
       // Requirement: Free High-quality Generation
-      audioUrl = await generateHybridSpeech(aiResponseText, detectedLanguage);
+      audioUrl = await trackAIUsage({
+        userId: null,
+        businessId,
+        requestType: 'voice',
+        provider: 'voxy-hybrid',
+        model: 'msedge-google-tts'
+      }, async () => await generateHybridSpeech(aiResponseText, detectedLanguage));
       const ttsDurationSeconds = Math.round((Date.now() - ttsStartTime) / 1000) || 1;
       
       if (businessId) {

@@ -11,6 +11,7 @@ import {
 import { notifyBusiness } from '@/lib/notifications';
 import { detectLanguageGemini, validateResponseLanguage } from '@/lib/ai/utils/language';
 import { trackUsage } from '@/lib/tracking';
+import { trackAIUsage } from '@/lib/ai/observability';
 import { getFallbackResponse, validateAIResponse } from '@/lib/ai/utils/fallback';
 import { deductCredit, CREDIT_ERRORS } from '@/lib/services/credit-service';
 
@@ -71,7 +72,13 @@ export async function POST(req) {
     const lastMessage = lastMsgRes.rows[0]?.content || '';
 
     // 2b. MULTILINGUAL DETECTION (NEW)
-    const detectedLanguage = await detectLanguageGemini(lastMessage);
+    const detectedLanguage = await trackAIUsage({
+      userId: conv.customer_id,
+      businessId: conv.business_id,
+      requestType: 'system',
+      provider: 'gemini',
+      model: 'language-detector'
+    }, async () => await detectLanguageGemini(lastMessage));
     console.log(`[AI-CHAT] Detected Language: ${detectedLanguage}`);
 
     if (detectedLanguage === 'unsupported') {
@@ -123,7 +130,13 @@ export async function POST(req) {
     // Check if we need to summarize first
     let convSummary = conv.summary;
     if (!convSummary) {
-      convSummary = await summarizeConversation(conversationId);
+      convSummary = await trackAIUsage({
+        userId: conv.customer_id,
+        businessId: conv.business_id,
+        requestType: 'system',
+        provider: 'gemini',
+        model: 'summarizer'
+      }, async () => await summarizeConversation(conversationId));
     }
 
     const { include: includeBusinessContext } = shouldIncludeBusinessContext(lastMessage, conv, !!convSummary);
@@ -156,7 +169,13 @@ STRICT DIRECTIVES:
 
     // 5. GENERATE AI RESPONSE
     console.log(`🤖 Generating AI response for conversation ${conversationId} in ${detectedLanguage}...`);
-    let aiResponse = await generateAIResponse(normalizedPayload, systemInstruction);
+    let aiResponse = await trackAIUsage({
+      userId: conv.customer_id,
+      businessId: conv.business_id,
+      requestType: 'chat',
+      provider: 'voxy-hybrid',
+      model: 'gpt-4o-mini/gemini-flash'
+    }, async () => await generateAIResponse(normalizedPayload, systemInstruction));
 
     // 5b. FALLBACK & VALIDATION LAYER
     let isFallbackTriggered = aiResponse.failed || !validateAIResponse(aiResponse.text);
@@ -167,11 +186,23 @@ STRICT DIRECTIVES:
       aiResponse.text = getFallbackResponse(conv.assistant_tone);
     } else {
       // 5c. LANGUAGE VALIDATION LAYER
-      let isValidLanguage = await validateResponseLanguage(aiResponse.text, detectedLanguage);
+      let isValidLanguage = await trackAIUsage({
+        userId: conv.customer_id,
+        businessId: conv.business_id,
+        requestType: 'system',
+        provider: 'gemini',
+        model: 'language-validator'
+      }, async () => await validateResponseLanguage(aiResponse.text, detectedLanguage));
       if (!isValidLanguage) {
         console.warn(`⚠️ [AI-CHAT] Language validation FAILED. Output was not ${detectedLanguage}. Retrying...`);
         const stricterInstruction = `${systemInstruction}\n\nCRITICAL: YOUR LAST RESPONSE WAS IN THE WRONG LANGUAGE. YOU MUST RESPOND IN ${detectedLanguage.toUpperCase()} ONLY.`;
-        aiResponse = await generateAIResponse(normalizedPayload, stricterInstruction);
+        aiResponse = await trackAIUsage({
+          userId: conv.customer_id,
+          businessId: conv.business_id,
+          requestType: 'chat',
+          provider: 'voxy-hybrid',
+          model: 'gpt-4o-mini/gemini-flash'
+        }, async () => await generateAIResponse(normalizedPayload, stricterInstruction));
         
         // Final fallback check after retry
         if (aiResponse.failed || !validateAIResponse(aiResponse.text)) {

@@ -1,5 +1,6 @@
 import db from '@/lib/db';
 import { generateAIResponse } from './ai/core/generateAIResponse';
+import { trackAIUsage } from './ai/observability';
 
 /**
  * 1. BUSINESS CONTEXT COMPRESSION
@@ -56,7 +57,13 @@ Instructions: ${b.assistant_instructions}
 
   let aiSummary = '';
   try {
-    const aiResponse = await generateAIResponse(compressionPrompt, "Compress business profiles for systems.");
+    const aiResponse = await trackAIUsage({
+      userId: null,
+      businessId,
+      requestType: 'system',
+      provider: 'voxy-hybrid',
+      model: 'business-summarizer'
+    }, async () => await generateAIResponse(compressionPrompt, "Compress business profiles for systems."));
     aiSummary = aiResponse.text.trim();
     
     await db.query('UPDATE businesses SET ai_summary = $1 WHERE id = $2', [aiSummary, businessId]);
@@ -206,8 +213,9 @@ export async function getRecentMessages(conversationId, limit = 5) {
  */
 export async function summarizeConversation(conversationId) {
   // Check total message count
-  const countRes = await db.query('SELECT COUNT(*) FROM messages WHERE conversation_id = $1', [conversationId]);
+  const countRes = await db.query('SELECT COUNT(*), (SELECT business_id FROM conversations WHERE id = $1) as biz_id FROM messages WHERE conversation_id = $1', [conversationId]);
   const count = parseInt(countRes.rows[0].count, 10);
+  const businessId = countRes.rows[0].biz_id;
   
   if (count <= 10) return null; // No need to summarize yet
 
@@ -228,7 +236,13 @@ ${historyText}
   `.trim();
 
   try {
-    const aiResponse = await generateAIResponse(summarizePrompt, "Summarize conversations for memory.");
+    const aiResponse = await trackAIUsage({
+      userId: null,
+      businessId,
+      requestType: 'system',
+      provider: 'voxy-hybrid',
+      model: 'conversation-summarizer'
+    }, async () => await generateAIResponse(summarizePrompt, "Summarize conversations for memory."));
     const summary = aiResponse.text.trim();
     await db.query('UPDATE conversations SET summary = $1 WHERE id = $2', [summary, conversationId]);
     return summary;

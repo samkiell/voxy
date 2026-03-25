@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { detectLanguage } from '@/lib/langDetect';
 import { generateHybridSpeech } from '@/lib/ai/utils/hybridTts';
+import { trackAIUsage } from '@/lib/ai/observability';
+import db from '@/lib/db';
 
 /**
  * POST /api/tts
@@ -114,7 +116,13 @@ export async function POST(req) {
     }
 
     // Generate speech via existing hybrid engine (MsEdge → Google TTS fallback)
-    const audioDataUri = await generateHybridSpeech(text.trim(), hybridLang);
+    const audioDataUri = await trackAIUsage({
+      userId: null,
+      businessId: null,
+      requestType: 'voice',
+      provider: 'voxy-hybrid',
+      model: 'msedge-google-tts'
+    }, async () => await generateHybridSpeech(text.trim(), hybridLang));
 
     if (!audioDataUri) {
       return NextResponse.json(
