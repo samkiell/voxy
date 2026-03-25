@@ -131,7 +131,7 @@ export default function LighthouseOverviewPage() {
     },
     { 
       title: 'Monthly Consumption', 
-      value: stats.totalCost ? `$${stats.totalCost.toFixed(2)}` : '$0.00', 
+      value: stats.totalCost ? `$${Number(stats.totalCost).toFixed(2)}` : '$0.00', 
       description: 'Aggregate provider cost',
       icon: DollarSign, 
       colorClass: 'text-emerald-400'
@@ -179,7 +179,7 @@ export default function LighthouseOverviewPage() {
               />
               <AdminStatCard 
                 title="Model Spend" 
-                value={`$${(aiMetrics?.totalCost || 0).toFixed(4)}`} 
+                value={`$${Number(aiMetrics?.totalCost || 0).toFixed(4)}`} 
                 description="Estimated provider costs"
                 icon={DollarSign}
                 colorClass="text-emerald-500"
@@ -236,7 +236,7 @@ export default function LighthouseOverviewPage() {
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#ffffff03" vertical={false} />
                       <XAxis dataKey="date" stroke="#3f3f46" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} />
-                      <YAxis stroke="#3f3f46" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val.toFixed(2)}`} />
+                      <YAxis stroke="#3f3f46" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `$${Number(val).toFixed(2)}`} />
                       <Tooltip contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
                       <Area type="monotone" dataKey="cost" stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#costGradient)" animationDuration={1500} />
                     </AreaChart>
@@ -297,7 +297,7 @@ export default function LighthouseOverviewPage() {
                            </div>
                          </div>
                          <div className="text-right">
-                           <div className="text-xl font-bold text-white tracking-tight tabular-nums">${b.cost.toFixed(2)}</div>
+                           <div className="text-xl font-bold text-white tracking-tight tabular-nums">${Number(b.cost).toFixed(2)}</div>
                            <p className="text-[11px] font-bold text-zinc-500 mt-1 uppercase">Monthly Spend</p>
                          </div>
                        </div>
@@ -329,13 +329,13 @@ export default function LighthouseOverviewPage() {
                            <div className="size-8 rounded-lg bg-white/5 flex items-center justify-center text-voxy-primary shrink-0">
                               <Activity size={14} />
                            </div>
-                           <div className="space-y-1">
+                            <div className="space-y-1">
                               <p className="text-[12px] font-bold text-white">{log.businesses?.name || 'Unknown'}</p>
                               <div className="flex items-center gap-2">
                                 <span className={`text-[10px] font-bold uppercase tracking-widest ${log.type === 'llm' ? 'text-blue-400' : 'text-purple-400'}`}>
                                   {log.type}
                                 </span>
-                                <span className="text-zinc-600 text-[10px] tabular-nums">${log.cost_estimate.toFixed(4)}</span>
+                                <span className="text-zinc-600 text-[10px] tabular-nums">${Number(log.cost_estimate).toFixed(4)}</span>
                               </div>
                            </div>
                         </div>
