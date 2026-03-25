@@ -22,13 +22,13 @@ export async function POST(req) {
     }
 
     // 2. Perform adjustment
-    console.log(`👤 [Admin API] Adjusting credits for biz ${businessId} by ${amount}. Reason: ${reason}`);
+    console.log(`👤 [Admin API] Adjusting VP for biz ${businessId} by ${amount}. Reason: ${reason}`);
     const updatedBusiness = await adjustCredits(businessId, parseInt(amount), reason);
 
     return NextResponse.json({ 
       success: true, 
       balance: updatedBusiness.creditBalance,
-      message: `Successfully adjusted credits by ${amount}` 
+      message: `Successfully adjusted Voxy Points (VP) by ${amount}` 
     });
 
   } catch (error) {

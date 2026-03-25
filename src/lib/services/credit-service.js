@@ -36,7 +36,7 @@ export async function deductCredit(businessId) {
     // 2. Log Transaction
     await client.query(
       `INSERT INTO transactions (business_id, type, amount, reference) 
-       VALUES ($1, 'credit_usage', 1, $2)`,
+       VALUES ($1, 'vp_usage', 1, $2)`,
       [businessId, `usage_${Date.now()}`]
     );
 
@@ -78,7 +78,7 @@ export async function addCredits(businessId, amount, reference = null) {
     // 3. Log Transaction
     await client.query(
       `INSERT INTO transactions (business_id, type, amount, reference) 
-       VALUES ($1, 'credit_purchase', $2, $3)`,
+       VALUES ($1, 'vp_purchase', $2, $3)`,
       [businessId, amount, reference]
     );
 
@@ -107,7 +107,7 @@ export async function adjustCredits(businessId, amount, reason = 'Admin adjustme
 
     await client.query(
       `INSERT INTO transactions (business_id, type, amount, reference) 
-       VALUES ($1, 'manual_adjustment', $2, $3)`,
+       VALUES ($1, 'vp_adjustment', $2, $3)`,
       [businessId, amount, `admin_${Date.now()}`]
     );
 

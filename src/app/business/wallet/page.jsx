@@ -231,12 +231,12 @@ export default function WalletPage() {
                       className="flex items-center justify-between p-4 rounded-2xl border border-zinc-50 dark:border-[#222222] hover:bg-zinc-50 dark:hover:bg-[#0A0A0A]/50 transition-all group"
                      >
                        <div className="flex items-center gap-4">
-                           <div className={`p-3 rounded-2xl ${tx.type === 'credit_purchase' ? 'bg-voxy-primary/10 text-voxy-primary' : 'bg-red-500/10 text-red-400'}`}>
-                             {tx.type === 'credit_purchase' ? <ArrowUpRight size={20} /> : <ArrowDownLeft size={20} />}
+                           <div className={`p-3 rounded-2xl ${tx.type.includes('purchase') ? 'bg-voxy-primary/10 text-voxy-primary' : 'bg-red-500/10 text-red-400'}`}>
+                             {tx.type.includes('purchase') ? <ArrowUpRight size={20} /> : <ArrowDownLeft size={20} />}
                            </div>
                           <div>
                              <p className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
-                               {tx.type.replace('_', ' ').charAt(0).toUpperCase() + tx.type.replace('_', ' ').slice(1)}
+                               {tx.type.replace('credit', 'VP').replace('vp', 'VP').replace('_', ' ').split(' ').map(w => w.toUpperCase() === 'VP' ? 'VP' : w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                              </p>
                             <p className="text-[10px] font-medium text-zinc-400">
                               {new Date(tx.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
@@ -245,8 +245,8 @@ export default function WalletPage() {
                        </div>
                        
                        <div className="text-right">
-                           <p className={`text-lg font-black ${tx.type === 'credit_purchase' ? 'text-voxy-primary' : 'text-zinc-500'}`}>
-                            {tx.type === 'credit_purchase' ? '+' : '-'}{Math.abs(tx.amount)}
+                           <p className={`text-lg font-black ${tx.type.includes('purchase') ? 'text-voxy-primary' : 'text-zinc-500'}`}>
+                            {tx.type.includes('purchase') ? '+' : '-'}{Math.abs(tx.amount)}
                           </p>
                           <p className="text-[10px] font-bold text-zinc-400">
                             {new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
